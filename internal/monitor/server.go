@@ -222,8 +222,8 @@ func (s *Server) handleNodes(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	// 只返回初始检查通过的可用节点
-	payload := map[string]any{"nodes": s.mgr.SnapshotFiltered(true)}
+	// 返回所有节点（包括不健康的），前端会根据 available 字段区分健康状态
+	payload := map[string]any{"nodes": s.mgr.Snapshot()}
 	writeJSON(w, payload)
 }
 
