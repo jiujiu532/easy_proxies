@@ -1,5 +1,17 @@
 {
-  "subscriptions": {},
+  "subscriptions": {
+    "20260130154405i2e2uq": {
+      "id": "20260130154405i2e2uq",
+      "name": "佬友贡献",
+      "url": "https://gates.djjc.cfd/api/v1/client/subscribe?token=2f186dd498d0d33819ddaa7b6fe6c6b4\u0026flag=meta",
+      "enabled": true,
+      "refresh_interval": "30m",
+      "last_refresh_at": "0001-01-01T00:00:00Z",
+      "node_count": 0,
+      "created_at": "2026-01-30T15:44:05.3919081+08:00",
+      "updated_at": "2026-01-30T15:44:05.3919081+08:00"
+    }
+  },
   "node_states": {
     "假节点(仅用于启动)": {
       "name": "假节点(仅用于启动)",
@@ -10,8 +22,8 @@
       "type": "vless",
       "status": "enabled",
       "available": false,
-      "last_check_at": "2026-01-30T15:29:26.4917538+08:00",
-      "failure_count": 2,
+      "last_check_at": "2026-01-30T15:44:56.3314299+08:00",
+      "failure_count": 1,
       "success_count": 0
     },
     "剩余流量：18.13 GB": {

@@ -119,6 +119,8 @@ func Run(ctx context.Context, cfg *config.Config) error {
 
 		// Register new API handlers
 		poolHandler := monitor.NewProxyPoolHandler(pool, st)
+		poolHandler.SetConfig(cfg)
+		poolHandler.SetNodeManager(boxMgr)
 		poolHandler.RegisterRoutes(server.Mux(), server.WithAuth)
 	}
 

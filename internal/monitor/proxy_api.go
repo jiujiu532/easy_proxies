@@ -7,14 +7,17 @@ import (
 	"net/url"
 	"strings"
 
+	"easy_proxies/internal/config"
 	"easy_proxies/internal/proxypool"
 	"easy_proxies/internal/store"
 )
 
 // ProxyPoolHandler handles proxy pool API requests
 type ProxyPoolHandler struct {
-	pool  *proxypool.ProxyPool
-	store *store.Store
+	pool    *proxypool.ProxyPool
+	store   *store.Store
+	cfg     *config.Config
+	nodeMgr NodeManager
 }
 
 // NewProxyPoolHandler creates a new handler
@@ -23,6 +26,16 @@ func NewProxyPoolHandler(pool *proxypool.ProxyPool, st *store.Store) *ProxyPoolH
 		pool:  pool,
 		store: st,
 	}
+}
+
+// SetConfig sets the configuration for subscription updates
+func (h *ProxyPoolHandler) SetConfig(cfg *config.Config) {
+	h.cfg = cfg
+}
+
+// SetNodeManager sets the node manager for triggering reloads
+func (h *ProxyPoolHandler) SetNodeManager(nm NodeManager) {
+	h.nodeMgr = nm
 }
 
 // RegisterRoutes registers proxy pool API routes
@@ -221,9 +234,30 @@ func (h *ProxyPoolHandler) handleSubscriptions(w http.ResponseWriter, r *http.Re
 			return
 		}
 
+		// Also add to config file for reload to pick up
+		configUpdated := false
+		if h.cfg != nil {
+			// Check if URL already exists
+			exists := false
+			for _, existingURL := range h.cfg.Subscriptions {
+				if existingURL == sub.URL {
+					exists = true
+					break
+				}
+			}
+			if !exists {
+				h.cfg.Subscriptions = append(h.cfg.Subscriptions, sub.URL)
+				if err := h.cfg.Save(); err == nil {
+					configUpdated = true
+				}
+			}
+		}
+
 		writePoolJSON(w, map[string]any{
-			"message":      "Subscription added",
-			"subscription": sub,
+			"message":        "Subscription added",
+			"subscription":   sub,
+			"config_updated": configUpdated,
+			"note":           "请点击热重载按钮使订阅生效",
 		})
 
 	default:
@@ -274,12 +308,41 @@ func (h *ProxyPoolHandler) handleSubscriptionItem(w http.ResponseWriter, r *http
 		writePoolJSON(w, map[string]any{"message": "Subscription updated", "subscription": sub})
 
 	case http.MethodDelete:
+		// Get subscription URL before deleting
+		sub, _ := h.store.GetSubscription(id)
+		subURL := ""
+		if sub != nil {
+			subURL = sub.URL
+		}
+
 		if err := h.store.DeleteSubscription(id); err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			writePoolJSON(w, map[string]any{"error": err.Error()})
 			return
 		}
-		writePoolJSON(w, map[string]any{"message": "Subscription deleted"})
+
+		// Also remove from config file
+		configUpdated := false
+		if h.cfg != nil && subURL != "" {
+			newSubs := make([]string, 0, len(h.cfg.Subscriptions))
+			for _, u := range h.cfg.Subscriptions {
+				if u != subURL {
+					newSubs = append(newSubs, u)
+				}
+			}
+			if len(newSubs) < len(h.cfg.Subscriptions) {
+				h.cfg.Subscriptions = newSubs
+				if err := h.cfg.Save(); err == nil {
+					configUpdated = true
+				}
+			}
+		}
+
+		writePoolJSON(w, map[string]any{
+			"message":        "Subscription deleted",
+			"config_updated": configUpdated,
+			"note":           "请点击热重载按钮清理节点",
+		})
 
 	case http.MethodPost:
 		if action == "refresh" {
