@@ -2272,7 +2272,23 @@
         if (!res.ok) throw new Error('加载节点失败');
 
         const data = await res.json();
-        const nodes = data.proxies || [];
+        let nodes = data.proxies || [];
+
+        // Sort nodes: 
+        // 1. Available nodes (latency > 0) with lower latency first
+        // 2. Nodes with latency -1 or 0 (unknown) last
+        // 3. Within same latency/unknown, sort by failure_count (low to high)
+        nodes.sort((a, b) => {
+          const latA = (a.latency && a.latency > 0) ? a.latency : 999999;
+          const latB = (b.latency && b.latency > 0) ? b.latency : 999999;
+
+          if (latA !== latB) return latA - latB;
+
+          // If latency is same (or both unknown), sort by failure count
+          const failA = a.failure_count || 0;
+          const failB = b.failure_count || 0;
+          return failA - failB;
+        });
 
         const regionFlags = {
           'HK': '🇭🇰', 'TW': '🇹🇼', 'JP': '🇯🇵', 'KR': '🇰🇷', 'SG': '🇸🇬',

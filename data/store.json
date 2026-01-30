@@ -76,6 +76,39 @@
       "node_count": 0,
       "created_at": "2026-01-30T13:46:39.0303638+08:00",
       "updated_at": "2026-01-30T13:46:39.0303638+08:00"
+    },
+    "20260130135938yaauqq": {
+      "id": "20260130135938yaauqq",
+      "name": "",
+      "url": "https://webget.yfjc.xyz/api/v1/client/subscribe?token=761b2321a376a8f0c0a89a35ce403293\u0026flag=meta",
+      "enabled": true,
+      "refresh_interval": "1h",
+      "last_refresh_at": "0001-01-01T00:00:00Z",
+      "node_count": 0,
+      "created_at": "2026-01-30T13:59:38.8769715+08:00",
+      "updated_at": "2026-01-30T13:59:38.8769715+08:00"
+    },
+    "2026013014032462aeau": {
+      "id": "2026013014032462aeau",
+      "name": "",
+      "url": "https://webget.yfjc.xyz/api/v1/client/subscribe?token=761b2321a376a8f0c0a89a35ce403293\u0026flag=meta",
+      "enabled": true,
+      "refresh_interval": "1h",
+      "last_refresh_at": "0001-01-01T00:00:00Z",
+      "node_count": 0,
+      "created_at": "2026-01-30T14:03:24.1173996+08:00",
+      "updated_at": "2026-01-30T14:03:24.1173996+08:00"
+    },
+    "20260130140633a66aqi": {
+      "id": "20260130140633a66aqi",
+      "name": "",
+      "url": "https://webget.yfjc.xyz/api/v1/client/subscribe?token=761b2321a376a8f0c0a89a35ce403293\u0026flag=meta",
+      "enabled": true,
+      "refresh_interval": "1h",
+      "last_refresh_at": "0001-01-01T00:00:00Z",
+      "node_count": 0,
+      "created_at": "2026-01-30T14:06:33.0639871+08:00",
+      "updated_at": "2026-01-30T14:06:33.0639871+08:00"
     }
   },
   "node_states": {

@@ -38,4 +38,4 @@ latency_groups:
 
 auto_speedtest:
   enabled: true
-  interval: 30m
+  interval: 1m
