@@ -1013,9 +1013,11 @@
     <div class="tabs">
       <button class="tab active" onclick="switchTab('monitor')">📊 节点监控</button>
       <button class="tab" onclick="switchTab('manage')">⚙️ 节点管理</button>
+      <button class="tab" onclick="switchTab('subscription')">📦 订阅管理</button>
       <button class="tab" onclick="switchTab('proxypool')">🚀 代理池</button>
       <button class="tab" onclick="switchTab('debug')">🐞 调试面板</button>
     </div>
+
 
 
     <!-- 监控页面 -->
@@ -1133,8 +1135,45 @@
       </div>
     </div><!-- end manageTab -->
 
+    <!-- 订阅管理页面 -->
+    <div id="subscriptionTab" class="tab-content">
+      <div class="manage-header">
+        <h2>📦 订阅管理</h2>
+        <p class="manage-desc">管理代理订阅链接，自动获取节点</p>
+      </div>
+
+      <div class="controls" style="margin-bottom: 24px;">
+        <button class="btn btn-primary" onclick="showAddSubscriptionModal()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          添加订阅
+        </button>
+        <button class="btn btn-secondary" onclick="loadSubscriptions()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M13.65 2.35A7.958 7.958 0 0 0 8 0C3.58 0 0 3.58 0 8s3.58 8 8 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L9 7h7V0l-2.35 2.35z"
+              fill="currentColor" />
+          </svg>
+          刷新列表
+        </button>
+      </div>
+
+      <div id="subscriptionsList" class="config-nodes-grid"></div>
+
+      <div id="subscriptionEmptyState" class="empty" style="display: none;">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" opacity="0.2">
+          <rect x="8" y="16" width="48" height="32" rx="4" stroke="currentColor" stroke-width="4" />
+          <path d="M8 24h48" stroke="currentColor" stroke-width="4" />
+        </svg>
+        <h3>暂无订阅</h3>
+        <p>点击"添加订阅"开始管理订阅链接</p>
+      </div>
+    </div><!-- end subscriptionTab -->
+
     <!-- 代理池页面 -->
     <div id="proxypoolTab" class="tab-content">
+
       <div class="manage-header">
         <h2>🚀 代理池 API</h2>
         <p class="manage-desc">通过 API 获取可用代理，支持按条件筛选</p>
@@ -1324,7 +1363,45 @@
     </div>
   </div>
 
+  <!-- 订阅添加弹窗 -->
+  <div id="subscriptionModalOverlay" class="login-overlay">
+    <div class="login-modal">
+      <div class="login-header">
+        <h2 id="subscriptionModalTitle">📦 添加订阅</h2>
+        <p>输入订阅链接信息</p>
+      </div>
+      <form class="login-form" onsubmit="handleSubscriptionSubmit(event)">
+        <div class="form-group">
+          <label class="form-label" for="subName">订阅名称</label>
+          <input type="text" id="subName" class="form-input" placeholder="例如：我的机场" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="subUrl">订阅链接 <span style="color: var(--error);">*</span></label>
+          <input type="text" id="subUrl" class="form-input" placeholder="https://..." required />
+          <p class="form-help">支持 Base64、Clash YAML 等格式</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="subInterval">刷新间隔</label>
+          <select id="subInterval" class="form-input">
+            <option value="30m">30 分钟</option>
+            <option value="1h" selected>1 小时</option>
+            <option value="6h">6 小时</option>
+            <option value="12h">12 小时</option>
+            <option value="24h">24 小时</option>
+          </select>
+        </div>
+        <input type="hidden" id="subEditId" />
+        <div id="subscriptionModalError" class="login-error"></div>
+        <div class="modal-buttons">
+          <button type="button" class="btn btn-secondary" onclick="hideSubscriptionModal()">取消</button>
+          <button type="submit" class="btn btn-primary" id="subSubmitBtn">添加</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- 设置弹窗 -->
+
   <div id="settingsOverlay" class="login-overlay">
     <div class="login-modal">
       <div class="login-header">
@@ -2040,8 +2117,11 @@
         loadDebugData();
       } else if (tabName === 'proxypool') {
         loadPoolStats();
+      } else if (tabName === 'subscription') {
+        loadSubscriptions();
       }
     }
+
 
     // ========== 代理池功能 ==========
 
@@ -2103,7 +2183,179 @@
       });
     }
 
+    // ========== 订阅管理功能 ==========
+
+    let subscriptions = [];
+
+    async function loadSubscriptions() {
+      try {
+        const res = await fetch('/api/subscriptions');
+        if (res.status === 401) {
+          showToast('请先登录', 'error');
+          document.getElementById('loginOverlay').classList.add('show');
+          return;
+        }
+        if (!res.ok) throw new Error('加载失败');
+        const data = await res.json();
+        subscriptions = data.subscriptions || [];
+        renderSubscriptions();
+      } catch (err) {
+        showToast('加载订阅失败: ' + err.message, 'error');
+      }
+    }
+
+    function renderSubscriptions() {
+      const container = document.getElementById('subscriptionsList');
+      const emptyState = document.getElementById('subscriptionEmptyState');
+
+      if (subscriptions.length === 0) {
+        container.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      container.innerHTML = subscriptions.map(sub => {
+        const lastRefresh = sub.last_refresh_at && sub.last_refresh_at !== '0001-01-01T00:00:00Z'
+          ? new Date(sub.last_refresh_at).toLocaleString('zh-CN')
+          : '从未刷新';
+        const statusColor = sub.enabled ? 'var(--success)' : 'var(--text-secondary)';
+        const statusText = sub.enabled ? '已启用' : '已禁用';
+
+        return `
+          <div class="node-card" style="padding: 20px;">
+            <div class="node-header" style="margin-bottom: 12px;">
+              <div class="node-info">
+                <div class="node-name">${escapeHtml(sub.name || '未命名')}</div>
+                <div class="node-tag" style="word-break: break-all; max-width: 300px;">${escapeHtml(sub.url.substring(0, 50))}...</div>
+              </div>
+              <span class="status-badge" style="background: ${statusColor}20; color: ${statusColor};">${statusText}</span>
+            </div>
+            <div class="metrics" style="margin-bottom: 16px;">
+              <div class="metric">
+                <div class="metric-label">节点数</div>
+                <div class="metric-value">${sub.node_count || 0}</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">刷新间隔</div>
+                <div class="metric-value">${sub.refresh_interval || '1h'}</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">上次刷新</div>
+                <div class="metric-value" style="font-size: 12px;">${lastRefresh}</div>
+              </div>
+            </div>
+            ${sub.last_error ? `<div style="color: var(--error); font-size: 12px; margin-bottom: 12px;">⚠️ ${escapeHtml(sub.last_error)}</div>` : ''}
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary" style="flex: 1;" onclick="refreshSubscription('${sub.id}')">🔄 刷新</button>
+              <button class="btn btn-secondary" style="flex: 1;" onclick="toggleSubscription('${sub.id}', ${!sub.enabled})">${sub.enabled ? '⏸️ 禁用' : '▶️ 启用'}</button>
+              <button class="btn btn-secondary" style="flex: 1; color: var(--error);" onclick="deleteSubscription('${sub.id}')">🗑️ 删除</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showAddSubscriptionModal() {
+      document.getElementById('subscriptionModalTitle').textContent = '📦 添加订阅';
+      document.getElementById('subName').value = '';
+      document.getElementById('subUrl').value = '';
+      document.getElementById('subInterval').value = '1h';
+      document.getElementById('subEditId').value = '';
+      document.getElementById('subSubmitBtn').textContent = '添加';
+      document.getElementById('subscriptionModalError').textContent = '';
+      document.getElementById('subscriptionModalOverlay').classList.add('show');
+    }
+
+    function hideSubscriptionModal() {
+      document.getElementById('subscriptionModalOverlay').classList.remove('show');
+    }
+
+    async function handleSubscriptionSubmit(event) {
+      event.preventDefault();
+      const errorEl = document.getElementById('subscriptionModalError');
+      errorEl.textContent = '';
+
+      const name = document.getElementById('subName').value.trim();
+      const url = document.getElementById('subUrl').value.trim();
+      const interval = document.getElementById('subInterval').value;
+      const editId = document.getElementById('subEditId').value;
+
+      if (!url) {
+        errorEl.textContent = '请输入订阅链接';
+        return;
+      }
+
+      try {
+        let res;
+        if (editId) {
+          res = await fetch(`/api/subscriptions/${editId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, url, refresh_interval: interval, enabled: true })
+          });
+        } else {
+          res = await fetch('/api/subscriptions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, url, refresh_interval: interval })
+          });
+        }
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || '操作失败');
+        }
+
+        hideSubscriptionModal();
+        showToast(editId ? '订阅已更新' : '订阅已添加', 'success');
+        loadSubscriptions();
+
+        // Prompt to restart to apply subscription
+        if (!editId) {
+          showToast('请重启容器以加载订阅节点: docker restart easy-proxies', 'info');
+        }
+      } catch (err) {
+        errorEl.textContent = err.message;
+      }
+    }
+
+    async function refreshSubscription(id) {
+      try {
+        const res = await fetch(`/api/subscriptions/${id}/refresh`, { method: 'POST' });
+        if (!res.ok) throw new Error('刷新失败');
+        showToast('订阅刷新已触发，请稍后刷新页面查看', 'success');
+      } catch (err) {
+        showToast('刷新失败: ' + err.message, 'error');
+      }
+    }
+
+    async function toggleSubscription(id, enabled) {
+      try {
+        const res = await fetch(`/api/subscriptions/${id}/toggle`, { method: 'POST' });
+        if (!res.ok) throw new Error('操作失败');
+        showToast(enabled ? '订阅已启用' : '订阅已禁用', 'success');
+        loadSubscriptions();
+      } catch (err) {
+        showToast('操作失败: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteSubscription(id) {
+      if (!confirm('确定要删除这个订阅吗？')) return;
+
+      try {
+        const res = await fetch(`/api/subscriptions/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('删除失败');
+        showToast('订阅已删除', 'success');
+        loadSubscriptions();
+      } catch (err) {
+        showToast('删除失败: ' + err.message, 'error');
+      }
+    }
+
     // 加载配置节点列表
+
 
     async function loadConfigNodes() {
       try {
