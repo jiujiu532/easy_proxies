@@ -1855,6 +1855,9 @@ https://订阅3.com/xxx" required
         setTimeout(() => {
           progressEl.classList.remove('show');
           refresh();
+          // 同时刷新分组页面数据，让用户切换标签时能看到最新数据
+          loadRegionGroupsTab();
+          loadLatencyGroupsTab();
         }, 2000);
       }
     }
