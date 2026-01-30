@@ -1671,6 +1671,7 @@ https://订阅3.com/xxx" required
 
     async function refresh() {
       try {
+        // 始终刷新节点数据（用于统计和节点监控页面）
         const res = await fetch('/api/nodes');
         if (res.status === 401) {
           // 需要登录
@@ -1684,10 +1685,24 @@ https://订阅3.com/xxx" required
         render(data.nodes || []);
         updateStats(data.nodes || []);
         document.getElementById('lastUpdate').textContent = `更新于 ${new Date().toLocaleTimeString('zh-CN')}`;
+
+        // 根据当前激活的 tab 刷新对应数据
+        const activeTab = document.querySelector('.tab.active');
+        if (activeTab) {
+          const onclick = activeTab.getAttribute('onclick') || '';
+          if (onclick.includes('proxypool')) {
+            loadPoolStats();
+          } else if (onclick.includes('regionGroups')) {
+            loadRegionGroupsTab();
+          } else if (onclick.includes('latencyGroups')) {
+            loadLatencyGroupsTab();
+          }
+        }
       } catch (err) {
         showToast('刷新失败: ' + err.message, 'error');
       }
     }
+
 
     function updateStats(nodes) {
       document.getElementById('totalNodes').textContent = nodes.length;
