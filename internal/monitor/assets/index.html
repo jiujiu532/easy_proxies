@@ -1855,9 +1855,10 @@ https://订阅3.com/xxx" required
         setTimeout(() => {
           progressEl.classList.remove('show');
           refresh();
-          // 同时刷新分组页面数据，让用户切换标签时能看到最新数据
+          // 同时刷新分组页面和代理池数据，让用户切换标签时能看到最新数据
           loadRegionGroupsTab();
           loadLatencyGroupsTab();
+          loadPoolStats();
         }, 2000);
       }
     }
@@ -2227,7 +2228,8 @@ https://订阅3.com/xxx" required
         }
         const data = await res.json();
 
-        document.getElementById('poolTotalNodes').textContent = data.total_nodes || 0;
+        // Use available_nodes instead of total_nodes for consistency with latency groups
+        document.getElementById('poolTotalNodes').textContent = data.available_nodes || data.total_nodes || 0;
 
         const byLatency = data.by_latency || {};
         document.getElementById('poolLowNodes').textContent = byLatency.low || 0;

@@ -64,7 +64,11 @@ func Run(ctx context.Context, cfg *config.Config) error {
 		st.AddSubscription(sub)
 	}
 
-	// Build monitor config
+	// Clean up duplicate subscriptions (same URL)
+	if removed := st.DeduplicateSubscriptions(); removed > 0 {
+		fmt.Printf("🧹 Cleaned up %d duplicate subscriptions\n", removed)
+	}
+
 	proxyUsername := cfg.Listener.Username
 	proxyPassword := cfg.Listener.Password
 	if cfg.Mode == "multi-port" || cfg.Mode == "hybrid" {

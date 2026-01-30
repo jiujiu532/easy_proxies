@@ -145,10 +145,27 @@ func (s *Store) CalculateLatencyLevel(latencyMs int64) LatencyLevel {
 // --- Subscription Methods ---
 
 // AddSubscription adds a new subscription
+// If a subscription with the same URL already exists, it will be updated (if new one has better info)
 func (s *Store) AddSubscription(sub *Subscription) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	// Check if subscription with same URL already exists (deduplication)
+	for existingID, existingSub := range s.subscriptions {
+		if existingSub.URL == sub.URL {
+			// URL already exists, update Name if the new one has a better name
+			if sub.Name != "" && (existingSub.Name == "" || existingSub.Name == "未命名") {
+				existingSub.Name = sub.Name
+				existingSub.UpdatedAt = time.Now()
+				s.subscriptions[existingID] = existingSub
+				return s.save()
+			}
+			// Already exists with good name, skip
+			return nil
+		}
+	}
+
+	// New subscription
 	if sub.ID == "" {
 		sub.ID = generateID()
 	}
@@ -208,6 +225,51 @@ func (s *Store) ListSubscriptions() []*Subscription {
 		result = append(result, sub)
 	}
 	return result
+}
+
+// DeduplicateSubscriptions removes duplicate subscriptions with the same URL
+// Keeps the one with a name, removes unnamed duplicates
+func (s *Store) DeduplicateSubscriptions() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Map URL to best subscription (with name)
+	urlToSub := make(map[string]*Subscription)
+	urlToIDs := make(map[string][]string) // Track all IDs for each URL
+
+	for id, sub := range s.subscriptions {
+		url := sub.URL
+		urlToIDs[url] = append(urlToIDs[url], id)
+
+		existing, found := urlToSub[url]
+		if !found {
+			urlToSub[url] = sub
+		} else {
+			// Keep the one with a better name (not empty, not "未命名")
+			if sub.Name != "" && sub.Name != "未命名" && (existing.Name == "" || existing.Name == "未命名") {
+				urlToSub[url] = sub
+			}
+		}
+	}
+
+	// Remove duplicates
+	removed := 0
+	for url, ids := range urlToIDs {
+		if len(ids) > 1 {
+			bestSub := urlToSub[url]
+			for _, id := range ids {
+				if id != bestSub.ID {
+					delete(s.subscriptions, id)
+					removed++
+				}
+			}
+		}
+	}
+
+	if removed > 0 {
+		s.save()
+	}
+	return removed
 }
 
 // --- Node State Methods ---

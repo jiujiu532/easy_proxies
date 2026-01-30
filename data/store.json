@@ -10,6 +10,17 @@
       "node_count": 0,
       "created_at": "2026-01-30T17:43:20.4025233+08:00",
       "updated_at": "2026-01-30T17:43:20.4025233+08:00"
+    },
+    "20260130174654aa2u6a": {
+      "id": "20260130174654aa2u6a",
+      "name": "",
+      "url": "https://jkun.waimaosass.icu/api/v1/client/subscribe?token=67659aac123cea8fc0f11943fa87fc71",
+      "enabled": true,
+      "refresh_interval": "1h",
+      "last_refresh_at": "0001-01-01T00:00:00Z",
+      "node_count": 0,
+      "created_at": "2026-01-30T17:46:54.8053024+08:00",
+      "updated_at": "2026-01-30T17:46:54.8053024+08:00"
     }
   },
   "node_states": {
@@ -17,11 +28,27 @@
       "name": "tw-vless",
       "uri": "vless://test",
       "port": 24001,
-      "region": "TW",
-      "region_name": "Taiwan",
+      "region": "ES",
+      "region_name": "Spain",
       "latency": -1,
       "latency_level": "unknown",
       "type": "vless",
+      "status": "enabled",
+      "available": true,
+      "last_check_at": "0001-01-01T00:00:00Z",
+      "failure_count": 0,
+      "success_count": 0
+    },
+    "剩余流量：58.14 GB": {
+      "name": "剩余流量：58.14 GB",
+      "uri": "trojan://22f0a280-4dc2-400c-ad15-8b2d6c8ae2bf@sssg01.go52pokemon.com:55016?allowInsecure=1\u0026peer=www.volcengine.com\u0026sni=www.volcengine.com\u0026type=tcp#%E5%89%A9%E4%BD%99%E6%B5%81%E9%87%8F%EF%BC%9A58.14%20GB",
+      "port": 24002,
+      "subscription_name": "subscription",
+      "region": "GB",
+      "region_name": "United Kingdom",
+      "latency": -1,
+      "latency_level": "unknown",
+      "type": "trojan",
       "status": "enabled",
       "available": true,
       "last_check_at": "0001-01-01T00:00:00Z",
