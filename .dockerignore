@@ -1,7 +1,33 @@
-.git
-Dockerfile
+# Sensitive configuration files
 config.yaml
-config*.yml
-*.md
-bin
-**/node_modules
+test_config.yaml
+nodes.txt
+data/
+*.log
+
+# Binary files
+easy-proxies
+easy-proxies-*
+*.exe
+
+# IDE and editor
+.idea/
+.vscode/
+.serena/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Test artifacts
+coverage.out
+coverage.html
+
+# Qodo
+.qodo/
