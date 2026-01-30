@@ -1275,7 +1275,26 @@
         <pre id="poolTestResultContent"
           style="font-family: 'SF Mono', Menlo, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all;"></pre>
       </div>
+
+      <!-- 分组展示 -->
+      <div style="margin-top: 32px;">
+        <h3 style="margin-bottom: 16px; font-size: 18px;">🌍 地区分组</h3>
+        <div class="controls" style="margin-bottom: 16px; justify-content: flex-start;">
+          <button class="btn btn-secondary" onclick="loadRegionGroups()">📊 加载地区分组</button>
+        </div>
+        <div id="regionGroupsContainer" class="stats" style="display: none;"></div>
+      </div>
+
+      <div style="margin-top: 32px;">
+        <h3 style="margin-bottom: 16px; font-size: 18px;">⚡ 延迟分组详情</h3>
+        <div class="controls" style="margin-bottom: 16px; justify-content: flex-start;">
+          <button class="btn btn-secondary" onclick="loadLatencyGroups()">📊 加载延迟分组</button>
+        </div>
+        <div id="latencyGroupsContainer" style="display: none;"></div>
+      </div>
+
     </div><!-- end proxypoolTab -->
+
 
     <!-- 调试面板 -->
     <div id="debugTab" class="tab-content">
@@ -2183,7 +2202,112 @@
       });
     }
 
+    // ========== 分组功能 ==========
+
+    async function loadRegionGroups() {
+      try {
+        const res = await fetch('/api/groups/region');
+        if (res.status === 401) {
+          showToast('请先登录', 'error');
+          return;
+        }
+        if (!res.ok) throw new Error('加载失败');
+        const data = await res.json();
+        renderRegionGroups(data.groups || {});
+      } catch (err) {
+        showToast('加载地区分组失败: ' + err.message, 'error');
+      }
+    }
+
+    function renderRegionGroups(groups) {
+      const container = document.getElementById('regionGroupsContainer');
+      container.style.display = 'grid';
+      container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+      container.style.gap = '16px';
+
+      if (Object.keys(groups).length === 0) {
+        container.innerHTML = '<div style="color: var(--text-secondary); padding: 20px;">暂无节点数据，请先添加订阅或节点</div>';
+        return;
+      }
+
+      const regionFlags = {
+        'HK': '🇭🇰', 'TW': '🇹🇼', 'JP': '🇯🇵', 'KR': '🇰🇷', 'SG': '🇸🇬',
+        'US': '🇺🇸', 'CA': '🇨🇦', 'GB': '🇬🇧', 'DE': '🇩🇪', 'FR': '🇫🇷',
+        'NL': '🇳🇱', 'RU': '🇷🇺', 'AU': '🇦🇺', 'CN': '🇨🇳', 'unknown': '🌐'
+      };
+
+      container.innerHTML = Object.entries(groups).map(([region, nodes]) => {
+        const flag = regionFlags[region] || '🌐';
+        return `
+          <div class="stat-card" style="cursor: pointer;" onclick="showRegionNodes('${region}')">
+            <div class="stat-label">${flag} ${region}</div>
+            <div class="stat-value">${nodes.length} 个节点</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showRegionNodes(region) {
+      showToast(`点击查看 ${region} 区域的节点详情（功能开发中）`, 'info');
+    }
+
+    async function loadLatencyGroups() {
+      try {
+        const res = await fetch('/api/groups/latency');
+        if (res.status === 401) {
+          showToast('请先登录', 'error');
+          return;
+        }
+        if (!res.ok) throw new Error('加载失败');
+        const data = await res.json();
+        renderLatencyGroups(data.groups || {}, data.config || {});
+      } catch (err) {
+        showToast('加载延迟分组失败: ' + err.message, 'error');
+      }
+    }
+
+    function renderLatencyGroups(groups, config) {
+      const container = document.getElementById('latencyGroupsContainer');
+      container.style.display = 'block';
+
+      const latencyInfo = {
+        'low': { label: '低延迟', color: 'var(--success)', icon: '🟢', desc: `≤${config.low_threshold || 100}ms` },
+        'medium': { label: '中延迟', color: 'var(--warning)', icon: '🟡', desc: `≤${config.medium_threshold || 300}ms` },
+        'high': { label: '高延迟', color: 'var(--error)', icon: '🔴', desc: `>${config.medium_threshold || 300}ms` },
+        'unknown': { label: '未测试', color: 'var(--text-secondary)', icon: '⚪', desc: '未测速' }
+      };
+
+      if (Object.keys(groups).length === 0) {
+        container.innerHTML = '<div style="color: var(--text-secondary); padding: 20px;">暂无节点数据，请先添加订阅或节点</div>';
+        return;
+      }
+
+      container.innerHTML = Object.entries(groups).map(([level, nodes]) => {
+        const info = latencyInfo[level] || latencyInfo['unknown'];
+        return `
+          <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <span style="font-size: 24px;">${info.icon}</span>
+              <div>
+                <div style="font-weight: 600; color: ${info.color};">${info.label}</div>
+                <div style="font-size: 12px; color: var(--text-secondary);">${info.desc} | ${nodes.length} 个节点</div>
+              </div>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              ${nodes.slice(0, 10).map(node => `
+                <span style="background: ${info.color}20; color: ${info.color}; padding: 4px 12px; border-radius: 12px; font-size: 12px;">
+                  ${escapeHtml(node.name)} ${node.latency >= 0 ? `(${node.latency}ms)` : ''}
+                </span>
+              `).join('')}
+              ${nodes.length > 10 ? `<span style="color: var(--text-secondary); font-size: 12px;">...还有 ${nodes.length - 10} 个</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     // ========== 订阅管理功能 ==========
+
 
     let subscriptions = [];
 
