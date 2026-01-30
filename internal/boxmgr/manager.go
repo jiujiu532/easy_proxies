@@ -614,14 +614,24 @@ func (m *Manager) TriggerReload(ctx context.Context) error {
 	}
 
 	m.mu.RLock()
-	cfgCopy := m.copyConfigLocked()
+	configPath := ""
+	if m.cfg != nil {
+		configPath = m.cfg.FilePath()
+	}
 	portMap := m.cfg.BuildPortMap() // Preserve existing port assignments
 	m.mu.RUnlock()
 
-	if cfgCopy == nil {
-		return errConfigUnavailable
+	if configPath == "" {
+		return errors.New("no config file path available")
 	}
-	return m.ReloadWithPortMap(cfgCopy, portMap)
+
+	// Re-read config from disk to get latest changes
+	newCfg, err := config.Load(configPath)
+	if err != nil {
+		return fmt.Errorf("reload config from disk: %w", err)
+	}
+
+	return m.ReloadWithPortMap(newCfg, portMap)
 }
 
 // ReloadWithPortMap gracefully switches to a new configuration, preserving port assignments.
