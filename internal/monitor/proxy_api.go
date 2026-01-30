@@ -83,42 +83,73 @@ func (h *ProxyPoolHandler) handleGetProxy(w http.ResponseWriter, r *http.Request
 	}
 
 	// Parse filters
-	filter := &proxypool.Filter{}
-	if latency := r.URL.Query().Get("latency"); latency != "" {
-		filter.LatencyLevel = store.LatencyLevel(latency)
-	}
-	if region := r.URL.Query().Get("region"); region != "" {
-		filter.Region = strings.ToUpper(region)
-	}
-	if sub := r.URL.Query().Get("sub"); sub != "" {
-		filter.Subscription = sub
+	regionFilter := strings.ToUpper(r.URL.Query().Get("region"))
+	latencyFilter := r.URL.Query().Get("latency")
+
+	// Get available nodes from monitor manager (single source of truth)
+	var selectedNode *Snapshot
+	if h.monitorMgr != nil {
+		snapshots := h.monitorMgr.Snapshot()
+		var candidates []Snapshot
+		
+		for _, snap := range snapshots {
+			// Only include available nodes
+			if !snap.Available {
+				continue
+			}
+			
+			// Apply region filter
+			if regionFilter != "" && snap.Region != regionFilter {
+				continue
+			}
+			
+			// Apply latency filter
+			if latencyFilter != "" {
+				latencyLevel := h.classifyLatency(snap.LastLatencyMs)
+				if string(latencyLevel) != latencyFilter {
+					continue
+				}
+			}
+			
+			candidates = append(candidates, snap)
+		}
+		
+		// Select best node (lowest latency with valid latency > 0)
+		if len(candidates) > 0 {
+			bestIdx := 0
+			bestLatency := int64(999999)
+			for i, c := range candidates {
+				lat := c.LastLatencyMs
+				if lat > 0 && lat < bestLatency {
+					bestLatency = lat
+					bestIdx = i
+				}
+			}
+			selectedNode = &candidates[bestIdx]
+		}
 	}
 
-	// Get proxy
-	node, err := h.pool.GetProxy(filter)
-	if err != nil {
+	if selectedNode == nil {
 		w.WriteHeader(http.StatusServiceUnavailable)
-		writePoolJSON(w, map[string]any{"error": err.Error()})
+		writePoolJSON(w, map[string]any{"error": "no available proxy"})
 		return
 	}
 
 	// Return proxy URL
-	// Format: http://ip:port or socks5://ip:port
-	proxyURL := fmt.Sprintf("http://127.0.0.1:%d", node.Port)
-	if node.Port == 0 {
-		// Fallback to node info
-		proxyURL = node.URI
+	proxyURL := fmt.Sprintf("http://127.0.0.1:%d", selectedNode.Port)
+	if selectedNode.Port == 0 {
+		proxyURL = selectedNode.URI
 	}
 
 	// Check response format
 	format := r.URL.Query().Get("format")
 	if format == "json" {
 		writePoolJSON(w, map[string]any{
-			"proxy":    proxyURL,
-			"name":     node.Name,
-			"region":   node.Region,
-			"latency":  node.Latency,
-			"latency_level": node.LatencyLevel,
+			"proxy":         proxyURL,
+			"name":          selectedNode.Tag,
+			"region":        selectedNode.Region,
+			"latency":       selectedNode.LastLatencyMs,
+			"latency_level": h.classifyLatency(selectedNode.LastLatencyMs),
 		})
 		return
 	}

@@ -2274,7 +2274,7 @@ https://订阅3.com/xxx" required
 
       try {
         // Test with JSON format
-        const res = await fetch('/api/proxy/get?format=json&latency=low');
+        const res = await fetch('/api/proxy/get?format=json');
         const text = await res.text();
 
         try {
