@@ -1,11 +1,13 @@
 package monitor
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"easy_proxies/internal/config"
 	"easy_proxies/internal/proxypool"
@@ -362,12 +364,17 @@ func (h *ProxyPoolHandler) handleSubscriptions(w http.ResponseWriter, r *http.Re
 			}
 		}
 
-		// Auto trigger reload after adding subscription
+		// Auto trigger reload after adding subscription (async with delay to avoid conflicts)
 		reloadTriggered := false
 		if h.nodeMgr != nil && configUpdated {
-			if err := h.nodeMgr.TriggerReload(r.Context()); err == nil {
-				reloadTriggered = true
-			}
+			reloadTriggered = true
+			go func() {
+				// Delay a bit to ensure all cleanup is done
+				time.Sleep(500 * time.Millisecond)
+				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+				defer cancel()
+				_ = h.nodeMgr.TriggerReload(ctx)
+			}()
 		}
 
 		writePoolJSON(w, map[string]any{
@@ -455,12 +462,17 @@ func (h *ProxyPoolHandler) handleSubscriptionItem(w http.ResponseWriter, r *http
 			}
 		}
 
-		// Auto trigger reload after deleting subscription
+		// Auto trigger reload after deleting subscription (async with delay to avoid conflicts)
 		reloadTriggered := false
 		if h.nodeMgr != nil {
-			if err := h.nodeMgr.TriggerReload(r.Context()); err == nil {
-				reloadTriggered = true
-			}
+			reloadTriggered = true
+			go func() {
+				// Delay a bit to ensure all cleanup is done
+				time.Sleep(500 * time.Millisecond)
+				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+				defer cancel()
+				_ = h.nodeMgr.TriggerReload(ctx)
+			}()
 		}
 
 		writePoolJSON(w, map[string]any{

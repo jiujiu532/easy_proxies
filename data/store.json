@@ -1,50 +1,5 @@
 {
-  "subscriptions": {
-    "20260130202621yauu2i": {
-      "id": "20260130202621yauu2i",
-      "name": "一分",
-      "url": "https://webget.yfjc.xyz/api/v1/client/subscribe?token=761b2321a376a8f0c0a89a35ce403293\u0026flag=meta",
-      "enabled": true,
-      "refresh_interval": "1h",
-      "last_refresh_at": "0001-01-01T00:00:00Z",
-      "node_count": 0,
-      "created_at": "2026-01-30T20:26:21.4844999+08:00",
-      "updated_at": "2026-01-30T20:26:21.4844999+08:00"
-    },
-    "20260130202638eimqa2": {
-      "id": "20260130202638eimqa2",
-      "name": "宝可梦",
-      "url": "https://jkun.waimaosass.icu/api/v1/client/subscribe?token=67659aac123cea8fc0f11943fa87fc71",
-      "enabled": true,
-      "refresh_interval": "1h",
-      "last_refresh_at": "0001-01-01T00:00:00Z",
-      "node_count": 0,
-      "created_at": "2026-01-30T20:26:38.1999051+08:00",
-      "updated_at": "2026-01-30T20:26:38.1999051+08:00"
-    },
-    "20260130202712u2umq6": {
-      "id": "20260130202712u2umq6",
-      "name": "佬友贡献",
-      "url": "https://gates.djjc.cfd/api/v1/client/subscribe?token=2f186dd498d0d33819ddaa7b6fe6c6b4\u0026flag=meta",
-      "enabled": true,
-      "refresh_interval": "1h",
-      "last_refresh_at": "0001-01-01T00:00:00Z",
-      "node_count": 0,
-      "created_at": "2026-01-30T20:27:12.5511741+08:00",
-      "updated_at": "2026-01-30T20:27:12.5511741+08:00"
-    },
-    "20260130202739mqeaau": {
-      "id": "20260130202739mqeaau",
-      "name": "赔钱",
-      "url": "https://xn--cp3a08l.com/api/v1/client/subscribe?token=487cdf02c509c2d75312f26606767576",
-      "enabled": true,
-      "refresh_interval": "1h",
-      "last_refresh_at": "0001-01-01T00:00:00Z",
-      "node_count": 0,
-      "created_at": "2026-01-30T20:27:39.4792873+08:00",
-      "updated_at": "2026-01-30T20:27:39.4792873+08:00"
-    }
-  },
+  "subscriptions": {},
   "node_states": {
     "AD安道尔 01 | IEPL": {
       "name": "AD安道尔 01 | IEPL",
@@ -1653,6 +1608,22 @@
       "latency": -1,
       "latency_level": "unknown",
       "type": "trojan",
+      "status": "enabled",
+      "available": true,
+      "last_check_at": "0001-01-01T00:00:00Z",
+      "failure_count": 0,
+      "success_count": 0
+    },
+    "剩余流量：153.84 GB": {
+      "name": "剩余流量：153.84 GB",
+      "uri": "hysteria2://fffa9741-8a36-4a74-998e-a06006ec0351@208.87.242.105:50000?insecure=1\u0026sni=www.bing.com#%E5%89%A9%E4%BD%99%E6%B5%81%E9%87%8F%EF%BC%9A153.84+GB",
+      "port": 24161,
+      "subscription_name": "subscription",
+      "region": "GB",
+      "region_name": "United Kingdom",
+      "latency": -1,
+      "latency_level": "unknown",
+      "type": "hysteria2",
       "status": "enabled",
       "available": true,
       "last_check_at": "0001-01-01T00:00:00Z",
