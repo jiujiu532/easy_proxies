@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"easy_proxies/internal/config"
+	nodeutils "easy_proxies/internal/node"
 	poolout "easy_proxies/internal/outbound/pool"
 
 	C "github.com/sagernet/sing-box/constant"
@@ -51,10 +52,14 @@ func Build(cfg *config.Config) (option.Options, error) {
 		}
 		memberTags = append(memberTags, tag)
 		baseOutbounds = append(baseOutbounds, outbound)
+		// Detect region from node name
+		regionInfo := nodeutils.DetectRegion(node.Name)
 		meta := poolout.MemberMeta{
-			Name: node.Name,
-			URI:  node.URI,
-			Mode: cfg.Mode,
+			Name:       node.Name,
+			URI:        node.URI,
+			Mode:       cfg.Mode,
+			Region:     regionInfo.Code,
+			RegionName: regionInfo.Name,
 		}
 		// For multi-port and hybrid modes, use per-node port
 		if cfg.Mode == "multi-port" || cfg.Mode == "hybrid" {
