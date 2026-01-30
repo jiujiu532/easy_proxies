@@ -1,0 +1,41 @@
+mode: pool
+log_level: info
+
+subscriptions:
+  - "https://webget.yfjc.xyz/api/v1/client/subscribe?token=761b2321a376a8f0c0a89a35ce403293&flag=meta"
+
+# 添加一个静态节点保证能启动
+nodes:
+  - name: "启动测试节点(假)"
+    uri: "vmess://ew0KICAidiI6ICIyIiwNCiAgInBzIjogIuWQr+WKqOa1i+ivlemKgueCuSIsDQogICJhZGQiOiAiMTI3LjAuMC4xIiwNCiAgInBvcnQiOiAxMjM0LA0KICAiaWQiOiAiYWFhYWFhYWEtYWFhYS1hYWFhLWFhYWEtYWFhYWFhYWFhYWFhIiwNCiAgImFpZCI6IDAsDQogICJzY3kiOi autoIiwNCiAgIm5ldCI6ICJ3cyIsDQogICJ0eXBlIjogIm5vbmUiLA0KICAiaG9zdCI6ICIiLA0KICAicGF0aCI6ICIvIiwNCiAgInRscyI6ICIiDQp9"
+
+subscription_refresh:
+  enabled: true
+  interval: 1h
+  timeout: 30s
+  min_available_nodes: 0 # 允许0个可用节点，防止启动失败
+
+management:
+  enabled: true
+  listen: 0.0.0.0:9090
+  probe_target: www.google.com:80
+  password: ""
+
+listener:
+  address: 0.0.0.0
+  port: 2323
+  username: proxy
+  password: proxy123
+
+pool:
+  mode: latency_first
+  failure_threshold: 3
+  blacklist_duration: 24h
+
+latency_groups:
+  low_threshold: 100
+  medium_threshold: 300
+
+auto_speedtest:
+  enabled: true
+  interval: 30m
