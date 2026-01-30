@@ -2241,8 +2241,8 @@
     function renderRegionGroups(groups) {
       const container = document.getElementById('regionGroupsContainer');
       container.style.display = 'grid';
-      container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
-      container.style.gap = '16px';
+      container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(180px, 1fr))';
+      container.style.gap = '12px';
 
       if (Object.keys(groups).length === 0) {
         container.innerHTML = '<div style="color: var(--text-secondary); padding: 20px;">暂无节点数据，请先添加订阅或节点</div>';
@@ -2252,15 +2252,73 @@
       const regionFlags = {
         'HK': '🇭🇰', 'TW': '🇹🇼', 'JP': '🇯🇵', 'KR': '🇰🇷', 'SG': '🇸🇬',
         'US': '🇺🇸', 'CA': '🇨🇦', 'GB': '🇬🇧', 'DE': '🇩🇪', 'FR': '🇫🇷',
-        'NL': '🇳🇱', 'RU': '🇷🇺', 'AU': '🇦🇺', 'CN': '🇨🇳', 'unknown': '🌐'
+        'NL': '🇳🇱', 'RU': '🇷🇺', 'AU': '🇦🇺', 'CN': '🇨🇳', 'BR': '🇧🇷', 'IN': '🇮🇳', 'unknown': '🌐'
       };
+
+      // Color palette for different regions
+      const regionColors = {
+        'HK': { bg: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%)', text: '#fff' },
+        'TW': { bg: 'linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)', text: '#fff' },
+        'JP': { bg: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', text: '#333' },
+        'KR': { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', text: '#fff' },
+        'SG': { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', text: '#fff' },
+        'US': { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', text: '#fff' },
+        'CA': { bg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', text: '#333' },
+        'GB': { bg: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', text: '#333' },
+        'DE': { bg: 'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)', text: '#333' },
+        'FR': { bg: 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)', text: '#fff' },
+        'NL': { bg: 'linear-gradient(135deg, #fddb92 0%, #d1fdff 100%)', text: '#333' },
+        'RU': { bg: 'linear-gradient(135deg, #c1dfc4 0%, #deecdd 100%)', text: '#333' },
+        'AU': { bg: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', text: '#333' },
+        'BR': { bg: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', text: '#fff' },
+        'IN': { bg: 'linear-gradient(135deg, #ff9966 0%, #ff5e62 100%)', text: '#fff' },
+        'unknown': { bg: 'linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)', text: '#fff' },
+      };
+
+      const defaultColor = { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', text: '#fff' };
 
       container.innerHTML = Object.entries(groups).map(([region, nodes]) => {
         const flag = regionFlags[region] || '🌐';
+        const color = regionColors[region] || defaultColor;
+        const nodeCount = nodes.length;
+
+        // Calculate best latency and average latency
+        const validLatencies = nodes.filter(n => n.latency && n.latency > 0).map(n => n.latency);
+        const bestLatency = validLatencies.length > 0 ? Math.min(...validLatencies) : null;
+        const avgLatency = validLatencies.length > 0 ? Math.round(validLatencies.reduce((a, b) => a + b, 0) / validLatencies.length) : null;
+
+        // Latency display
+        let latencyInfo = '';
+        if (bestLatency !== null) {
+          const latencyColor = bestLatency <= 100 ? '#4ade80' : bestLatency <= 300 ? '#facc15' : '#f87171';
+          latencyInfo = `<div style="font-size: 12px; margin-top: 6px; opacity: 0.9;">
+            ⚡ 最快 <span style="font-weight: 600; color: ${latencyColor};">${bestLatency}ms</span>
+            ${avgLatency ? `｜📊 平均 ${avgLatency}ms` : ''}
+          </div>`;
+        } else {
+          latencyInfo = `<div style="font-size: 12px; margin-top: 6px; opacity: 0.7;">🔍 点击查看详情</div>`;
+        }
+
         return `
-          <div class="stat-card" style="cursor: pointer;" onclick="showRegionNodes('${region}')">
-            <div class="stat-label">${flag} ${region}</div>
-            <div class="stat-value">${nodes.length} 个节点</div>
+          <div class="region-card" onclick="showRegionNodes('${region}')" style="
+            background: ${color.bg};
+            color: ${color.text};
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+          " onmouseover="this.style.transform='translateY(-4px) scale(1.02)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)';" 
+             onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)';">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 24px;">${flag}</span>
+              <span style="font-size: 18px; font-weight: 700;">${region}</span>
+            </div>
+            <div style="font-size: 28px; font-weight: 800;">${nodeCount}</div>
+            <div style="font-size: 13px; opacity: 0.85;">个节点</div>
+            ${latencyInfo}
           </div>
         `;
       }).join('');
