@@ -1,18 +1,19 @@
 {
-  "subscriptions": {
-    "202601301519316uaue6": {
-      "id": "202601301519316uaue6",
-      "name": "",
-      "url": "https://webget.yfjc.xyz/api/v1/client/subscribe?token=761b2321a376a8f0c0a89a35ce403293\u0026flag=meta",
-      "enabled": true,
-      "refresh_interval": "1h",
-      "last_refresh_at": "0001-01-01T00:00:00Z",
-      "node_count": 0,
-      "created_at": "2026-01-30T15:19:31.2869033+08:00",
-      "updated_at": "2026-01-30T15:19:31.2869033+08:00"
-    }
-  },
+  "subscriptions": {},
   "node_states": {
+    "假节点(仅用于启动)": {
+      "name": "假节点(仅用于启动)",
+      "uri": "vless://00000000-0000-0000-0000-000000000000@127.0.0.1:12345?type=tcp\u0026security=none#FakeNode",
+      "port": 28000,
+      "latency": -1,
+      "latency_level": "unknown",
+      "type": "vless",
+      "status": "enabled",
+      "available": false,
+      "last_check_at": "2026-01-30T15:29:26.4917538+08:00",
+      "failure_count": 2,
+      "success_count": 0
+    },
     "剩余流量：18.13 GB": {
       "name": "剩余流量：18.13 GB",
       "uri": "hysteria2://1db7d654-c355-4b77-bb1f-03e501b99d8d@203.10.98.187:443?insecure=1\u0026sni=www.bing.com#%E5%89%A9%E4%BD%99%E6%B5%81%E9%87%8F%EF%BC%9A18.13+GB",

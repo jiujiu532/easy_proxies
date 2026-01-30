@@ -26,12 +26,11 @@ subscription_refresh:
     drain_timeout: 0s
     min_available_nodes: 0
 nodes:
-    - name: 启动测试节点(假)
-      uri: vmess://ew0KICAidiI6ICIyIiwNCiAgInBzIjogIuWQr+WKqOa1i+ivlemKgueCuSIsDQogICJhZGQiOiAiMTI3LjAuMC4xIiwNCiAgInBvcnQiOiAxMjM0LA0KICAiaWQiOiAiYWFhYWFhYWEtYWFhYS1hYWFhLWFhYWEtYWFhYWFhYWFhYWFhIiwNCiAgImFpZCI6IDAsDQogICJzY3kiOi autoIiwNCiAgIm5ldCI6ICJ3cyIsDQogICJ0eXBlIjogIm5vbmUiLA0KICAiaG9zdCI6ICIiLA0KICAicGF0aCI6ICIvIiwNCiAgInRscyI6ICIiDQp9
+    - name: 假节点(仅用于启动)
+      uri: vless://00000000-0000-0000-0000-000000000000@127.0.0.1:12345?type=tcp&security=none#FakeNode
       port: 28000
 nodes_file: ""
-subscriptions:
-    - https://webget.yfjc.xyz/api/v1/client/subscribe?token=761b2321a376a8f0c0a89a35ce403293&flag=meta
+subscriptions: []
 subscription_configs: []
 external_ip: ""
 log_level: info
