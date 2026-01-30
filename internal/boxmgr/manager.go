@@ -240,6 +240,13 @@ func (m *Manager) Reload(newCfg *config.Config) error {
 	m.mu.Unlock()
 
 	m.logger.Infof("reload completed successfully with %d nodes", len(newCfg.Nodes))
+
+	// Trigger immediate health check after reload to avoid waiting for periodic check
+	if monMgr != nil {
+		m.logger.Infof("triggering immediate health check after reload")
+		monMgr.TriggerImmediateHealthCheck()
+	}
+
 	return nil
 }
 

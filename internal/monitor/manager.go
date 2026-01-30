@@ -274,6 +274,15 @@ func (m *Manager) ClearNodes() {
 	m.nodes = make(map[string]*entry)
 }
 
+// TriggerImmediateHealthCheck immediately runs a health check on all nodes.
+// This is called after reload/subscription refresh to avoid waiting for the periodic check.
+func (m *Manager) TriggerImmediateHealthCheck() {
+	if !m.probeReady {
+		return
+	}
+	go m.probeAllNodes(5 * time.Second) // 5 second timeout per node
+}
+
 func parsePort(value string) uint16 {
 	p, err := strconv.Atoi(value)
 	if err != nil || p <= 0 || p > 65535 {
