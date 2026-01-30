@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -206,10 +205,8 @@ func (m *Manager) probeAllNodes(timeout time.Duration) {
 		m.logger.Info("starting health check for ", len(entries), " nodes")
 	}
 
-	workerLimit := runtime.NumCPU() * 2
-	if workerLimit < 8 {
-		workerLimit = 8
-	}
+	// 使用高并发数加快健康检查速度
+	workerLimit := 100 // 支持同时探测 100 个节点
 	sem := make(chan struct{}, workerLimit)
 	var wg sync.WaitGroup
 	var availableCount atomic.Int32

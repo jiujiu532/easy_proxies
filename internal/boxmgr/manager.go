@@ -29,7 +29,7 @@ const (
 	defaultHealthCheckTimeout = 30 * time.Second
 	healthCheckPollInterval   = 500 * time.Millisecond
 	periodicHealthInterval    = 5 * time.Minute
-	periodicHealthTimeout     = 10 * time.Second
+	periodicHealthTimeout     = 5 * time.Second
 )
 
 // Logger defines logging interface for the manager.
