@@ -145,42 +145,60 @@ func (h *ProxyPoolHandler) handleListProxies(w http.ResponseWriter, r *http.Requ
 	}
 
 	// Parse filters
-	filter := &proxypool.Filter{}
-	if latency := r.URL.Query().Get("latency"); latency != "" {
-		filter.LatencyLevel = store.LatencyLevel(latency)
-	}
-	if region := r.URL.Query().Get("region"); region != "" {
-		filter.Region = strings.ToUpper(region)
-	}
-	if sub := r.URL.Query().Get("sub"); sub != "" {
-		filter.Subscription = sub
-	}
-
-	limit := 0 // No limit by default
+	regionFilter := strings.ToUpper(r.URL.Query().Get("region"))
+	latencyFilter := r.URL.Query().Get("latency")
+	limit := 0
 	if l := r.URL.Query().Get("limit"); l != "" {
 		fmt.Sscanf(l, "%d", &limit)
 	}
 
-	nodes := h.pool.GetProxyList(filter, limit)
-
-	// Build response
-	proxies := make([]map[string]any, 0, len(nodes))
-	for _, node := range nodes {
-		proxyURL := fmt.Sprintf("http://127.0.0.1:%d", node.Port)
-		proxies = append(proxies, map[string]any{
-			"proxy":         proxyURL,
-			"name":          node.Name,
-			"uri":           node.URI,
-			"type":          node.Type,
-			"region":        node.Region,
-			"region_name":   node.RegionName,
-			"latency":       node.Latency,
-			"latency_level": node.LatencyLevel,
-			"subscription":  node.SubscriptionName,
-			"failure_count": node.FailureCount,
-			"status":        "online", // Default status, can be improved
-		})
-
+	// Build response from monitor manager (single source of truth for latency)
+	var proxies []map[string]any
+	
+	if h.monitorMgr != nil {
+		snapshots := h.monitorMgr.Snapshot()
+		for _, snap := range snapshots {
+			// Apply region filter
+			if regionFilter != "" && snap.Region != regionFilter {
+				continue
+			}
+			
+			// Apply latency filter
+			if latencyFilter != "" {
+				latencyLevel := h.classifyLatency(snap.LastLatencyMs)
+				if string(latencyLevel) != latencyFilter {
+					continue
+				}
+			}
+			
+			// Only include available nodes
+			if !snap.Available {
+				continue
+			}
+			
+			proxies = append(proxies, map[string]any{
+				"proxy":         fmt.Sprintf("http://127.0.0.1:%d", snap.Port),
+				"name":          snap.Tag,
+				"uri":           snap.URI,
+				"type":          snap.Mode, // Use Mode as type
+				"region":        snap.Region,
+				"region_name":   snap.RegionName,
+				"latency":       snap.LastLatencyMs,
+				"latency_level": h.classifyLatency(snap.LastLatencyMs),
+				"subscription":  "", // Not available in Snapshot
+				"failure_count": snap.FailureCount,
+				"status":        "online",
+			})
+		}
+		
+		// Apply limit
+		if limit > 0 && len(proxies) > limit {
+			proxies = proxies[:limit]
+		}
+	}
+	
+	if proxies == nil {
+		proxies = []map[string]any{}
 	}
 
 	writePoolJSON(w, map[string]any{
@@ -188,6 +206,21 @@ func (h *ProxyPoolHandler) handleListProxies(w http.ResponseWriter, r *http.Requ
 		"proxies": proxies,
 	})
 }
+
+// classifyLatency returns latency level based on ms value
+func (h *ProxyPoolHandler) classifyLatency(ms int64) store.LatencyLevel {
+	if ms <= 0 {
+		return store.LatencyLevelUnknown
+	}
+	if ms <= 100 {
+		return store.LatencyLevelLow
+	}
+	if ms <= 300 {
+		return store.LatencyLevelMedium
+	}
+	return store.LatencyLevelHigh
+}
+
 
 // handleStats returns pool statistics from monitor manager (single source of truth)
 func (h *ProxyPoolHandler) handleStats(w http.ResponseWriter, r *http.Request) {

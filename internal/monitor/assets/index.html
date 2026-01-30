@@ -2439,7 +2439,7 @@ https://订阅3.com/xxx" required
 
         // Sort nodes: 
         // 1. Available nodes (latency > 0) with lower latency first
-        // 2. Nodes with latency -1 or 0 (unknown) last
+        // 2. Nodes with latency 0 or -1 (unknown) last
         // 3. Within same latency/unknown, sort by failure_count (low to high)
         nodes.sort((a, b) => {
           const latA = (a.latency && a.latency > 0) ? a.latency : 999999;
@@ -2470,11 +2470,12 @@ https://订阅3.com/xxx" required
           listContainer.innerHTML = nodes.map(node => {
             let latencyColor = 'var(--text-secondary)';
             let latencyText = '未测速';
-
-            if (node.latency >= 0) {
-              latencyText = node.latency + ' ms';
-              if (node.latency <= 100) latencyColor = 'var(--success)';
-              else if (node.latency <= 300) latencyColor = 'var(--warning)';
+            // latency > 0 表示已测速，0 和 -1 都表示未测速
+            const latency = node.latency || 0;
+            if (latency > 0) {
+              latencyText = latency + ' ms';
+              if (latency <= 100) latencyColor = 'var(--success)';
+              else if (latency <= 300) latencyColor = 'var(--warning)';
               else latencyColor = 'var(--error)';
             }
 
