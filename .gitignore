@@ -7,7 +7,9 @@ easy_proxies-*
 
 # Configuration (contains sensitive data)
 config.yaml
+test_config.yaml
 nodes.txt
+data/
 
 # Logs
 *.log
