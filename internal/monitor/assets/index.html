@@ -2272,7 +2272,7 @@
         if (!res.ok) throw new Error('加载节点失败');
 
         const data = await res.json();
-        const nodes = data.nodes || [];
+        const nodes = data.proxies || [];
 
         const regionFlags = {
           'HK': '🇭🇰', 'TW': '🇹🇼', 'JP': '🇯🇵', 'KR': '🇰🇷', 'SG': '🇸🇬',
@@ -2300,21 +2300,23 @@
             }
 
             return `
-              <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 8px;">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
-                  <div style="font-weight: 500; font-size: 14px;">${escapeHtml(node.name)}</div>
-                  <div style="font-size: 12px; color: ${latencyColor}; font-weight: 600;">${latencyText}</div>
+              <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                  <div style="font-weight: 600; font-size: 15px; color: var(--text-primary);">${escapeHtml(node.name)}</div>
+                  <div style="font-size: 13px; color: ${latencyColor}; font-weight: 600; background: rgba(0,0,0,0.03); padding: 2px 8px; border-radius: 4px;">${latencyText}</div>
                 </div>
-                <div style="font-size: 12px; color: var(--text-secondary); word-break: break-all; margin-bottom: 8px;">
-                  ${escapeHtml(node.type)} | ${escapeHtml(node.failure_count)} 次失败
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; display: flex; gap: 12px;">
+                  <span>类型: ${escapeHtml(node.type)}</span>
+                  <span>失败: <span style="color: ${node.failure_count > 0 ? 'var(--error)' : 'inherit'}">${escapeHtml(node.failure_count)}</span></span>
                 </div>
-                <div style="font-size: 11px; color: var(--text-secondary); background: rgba(0,0,0,0.03); padding: 4px; border-radius: 4px; word-break: break-all;">
-                   ${escapeHtml(node.uri.substring(0, 60))}...
+                <div style="font-size: 12px; color: var(--text-secondary); background: rgba(0,0,0,0.03); padding: 8px; border-radius: 6px; word-break: break-all; font-family: monospace;">
+                   ${escapeHtml(node.uri.substring(0, 80))}...
                 </div>
               </div>
             `;
           }).join('');
         }
+
 
         document.getElementById('regionDetailModalOverlay').classList.add('show');
       } catch (err) {
