@@ -268,6 +268,13 @@ func (m *Manager) Stop() {
 	}
 }
 
+// ClearNodes removes all registered nodes (used during config reload)
+func (m *Manager) ClearNodes() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.nodes = make(map[string]*entry)
+}
+
 func parsePort(value string) uint16 {
 	p, err := strconv.Atoi(value)
 	if err != nil || p <= 0 || p > 65535 {

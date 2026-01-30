@@ -246,6 +246,13 @@ func (s *Store) SetNodeStatus(name string, status NodeStatus) error {
 	return s.save()
 }
 
+// ClearAllNodes removes all cached node states (used during config reload)
+func (s *Store) ClearAllNodes() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.nodeStates = make(map[string]*EnhancedNode)
+}
+
 // ListNodesByLatency returns nodes filtered by latency level
 func (s *Store) ListNodesByLatency(level LatencyLevel) []*EnhancedNode {
 	s.mu.RLock()
