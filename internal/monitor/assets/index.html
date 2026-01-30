@@ -1276,21 +1276,27 @@
           style="font-family: 'SF Mono', Menlo, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all;"></pre>
       </div>
 
-      <!-- 分组展示 -->
-      <div style="margin-top: 32px;">
-        <h3 style="margin-bottom: 16px; font-size: 18px;">🌍 地区分组</h3>
-        <div class="controls" style="margin-bottom: 16px; justify-content: flex-start;">
-          <button class="btn btn-secondary" onclick="loadRegionGroups()">📊 加载地区分组</button>
+      <!-- 分组展示 - 并排布局 -->
+      <div style="margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <!-- 地区分组 -->
+        <div style="background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 16px;">🌍 地区分组</h3>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;"
+              onclick="loadRegionGroups()">📊 加载</button>
+          </div>
+          <div id="regionGroupsContainer" class="stats" style="display: none;"></div>
         </div>
-        <div id="regionGroupsContainer" class="stats" style="display: none;"></div>
-      </div>
 
-      <div style="margin-top: 32px;">
-        <h3 style="margin-bottom: 16px; font-size: 18px;">⚡ 延迟分组详情</h3>
-        <div class="controls" style="margin-bottom: 16px; justify-content: flex-start;">
-          <button class="btn btn-secondary" onclick="loadLatencyGroups()">📊 加载延迟分组</button>
+        <!-- 延迟分组 -->
+        <div style="background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 16px;">⚡ 延迟分组</h3>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;"
+              onclick="loadLatencyGroups()">📊 加载</button>
+          </div>
+          <div id="latencyGroupsContainer" style="display: none;"></div>
         </div>
-        <div id="latencyGroupsContainer" style="display: none;"></div>
       </div>
 
     </div><!-- end proxypoolTab -->
@@ -2710,13 +2716,30 @@ https://订阅3.com/xxx" required
     }
 
     async function deleteSubscription(id) {
-      if (!confirm('确定要删除这个订阅吗？')) return;
+      if (!confirm('确定要删除这个订阅吗？\n\n删除后将自动热重载以清理相关节点。')) return;
 
       try {
         const res = await fetch(`/api/subscriptions/${id}`, { method: 'DELETE' });
         if (!res.ok) throw new Error('删除失败');
         showToast('订阅已删除', 'success');
         loadSubscriptions();
+
+        // Auto reload to clear related nodes
+        showToast('🔄 正在热重载以清理节点...', 'info');
+        try {
+          const reloadRes = await fetch('/api/reload', { method: 'POST' });
+          if (reloadRes.ok) {
+            showToast('✅ 热重载完成，节点已清理', 'success');
+            setTimeout(() => {
+              loadConfigNodes();
+              loadPoolStats();
+            }, 2000);
+          } else {
+            showToast('⚠️ 热重载失败，请手动重启', 'warning');
+          }
+        } catch (err) {
+          showToast('⚠️ 热重载失败: ' + err.message, 'warning');
+        }
       } catch (err) {
         showToast('删除失败: ' + err.message, 'error');
       }
