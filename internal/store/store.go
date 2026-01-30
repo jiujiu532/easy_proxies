@@ -52,12 +52,14 @@ type EnhancedNode struct {
 	RegionName       string       `json:"region_name,omitempty"` // e.g., "United States", "Japan"
 	Latency          int64        `json:"latency"`               // in milliseconds, -1 if unknown
 	LatencyLevel     LatencyLevel `json:"latency_level"`
+	Type             string       `json:"type,omitempty"` // vless, vmess, ss, etc.
 	Status           NodeStatus   `json:"status"`
 	Available        bool         `json:"available"`
 	LastCheckAt      time.Time    `json:"last_check_at,omitempty"`
 	FailureCount     int          `json:"failure_count"`
 	SuccessCount     int64        `json:"success_count"`
 }
+
 
 // LatencyConfig defines thresholds for latency grouping
 type LatencyConfig struct {

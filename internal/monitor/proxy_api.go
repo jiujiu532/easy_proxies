@@ -151,12 +151,17 @@ func (h *ProxyPoolHandler) handleListProxies(w http.ResponseWriter, r *http.Requ
 		proxies = append(proxies, map[string]any{
 			"proxy":         proxyURL,
 			"name":          node.Name,
+			"uri":           node.URI,
+			"type":          node.Type,
 			"region":        node.Region,
 			"region_name":   node.RegionName,
 			"latency":       node.Latency,
 			"latency_level": node.LatencyLevel,
 			"subscription":  node.SubscriptionName,
+			"failure_count": node.FailureCount,
+			"status":        "online", // Default status, can be improved
 		})
+
 	}
 
 	writePoolJSON(w, map[string]any{

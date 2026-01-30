@@ -2306,12 +2306,13 @@
                   <div style="font-size: 13px; color: ${latencyColor}; font-weight: 600; background: rgba(0,0,0,0.03); padding: 2px 8px; border-radius: 4px;">${latencyText}</div>
                 </div>
                 <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; display: flex; gap: 12px;">
-                  <span>类型: ${escapeHtml(node.type)}</span>
-                  <span>失败: <span style="color: ${node.failure_count > 0 ? 'var(--error)' : 'inherit'}">${escapeHtml(node.failure_count)}</span></span>
+                  <span>类型: ${escapeHtml(node.type || 'unknown')}</span>
+                  <span>失败: <span style="color: ${(node.failure_count || 0) > 0 ? 'var(--error)' : 'inherit'}">${escapeHtml(node.failure_count || 0)}</span></span>
                 </div>
                 <div style="font-size: 12px; color: var(--text-secondary); background: rgba(0,0,0,0.03); padding: 8px; border-radius: 6px; word-break: break-all; font-family: monospace;">
-                   ${escapeHtml(node.uri.substring(0, 80))}...
+                   ${escapeHtml((node.uri || '').substring(0, 80))}...
                 </div>
+
               </div>
             `;
           }).join('');
