@@ -65,6 +65,17 @@
       "node_count": 0,
       "created_at": "2026-01-30T13:40:57.2729165+08:00",
       "updated_at": "2026-01-30T13:40:57.2729165+08:00"
+    },
+    "20260130134639ymu26m": {
+      "id": "20260130134639ymu26m",
+      "name": "",
+      "url": "https://webget.yfjc.xyz/api/v1/client/subscribe?token=761b2321a376a8f0c0a89a35ce403293\u0026flag=meta",
+      "enabled": true,
+      "refresh_interval": "1h",
+      "last_refresh_at": "0001-01-01T00:00:00Z",
+      "node_count": 0,
+      "created_at": "2026-01-30T13:46:39.0303638+08:00",
+      "updated_at": "2026-01-30T13:46:39.0303638+08:00"
     }
   },
   "node_states": {

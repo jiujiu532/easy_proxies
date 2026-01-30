@@ -6,8 +6,10 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
+
 
 	"easy_proxies/internal/boxmgr"
 	"easy_proxies/internal/config"
@@ -159,6 +161,15 @@ func Run(ctx context.Context, cfg *config.Config) error {
 	return nil
 }
 
+// detectNodeType returns the protocol type from URI
+func detectNodeType(uri string) string {
+	if strings.Contains(uri, "://") {
+		parts := strings.SplitN(uri, "://", 2)
+		return parts[0]
+	}
+	return "unknown"
+}
+
 // syncNodesToStore syncs nodes from boxMgr to store with region detection
 func syncNodesToStore(boxMgr *boxmgr.Manager, st *store.Store, cfg *config.Config) {
 	for _, nodeCfg := range cfg.Nodes {
@@ -169,6 +180,7 @@ func syncNodesToStore(boxMgr *boxmgr.Manager, st *store.Store, cfg *config.Confi
 			Name:       nodeCfg.Name,
 			URI:        nodeCfg.URI,
 			Port:       nodeCfg.Port,
+			Type:       detectNodeType(nodeCfg.URI),
 			Region:     regionInfo.Code,
 			RegionName: regionInfo.Name,
 			Status:     store.NodeStatusEnabled,
@@ -185,6 +197,7 @@ func syncNodesToStore(boxMgr *boxmgr.Manager, st *store.Store, cfg *config.Confi
 		st.UpdateNodeState(enhancedNode)
 	}
 }
+
 
 // runAutoSpeedtest runs periodic speed tests and updates latency groups
 func runAutoSpeedtest(ctx context.Context, boxMgr *boxmgr.Manager, st *store.Store, pool *proxypool.ProxyPool, interval time.Duration) {
