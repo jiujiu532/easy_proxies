@@ -1,25 +1,73 @@
 mode: pool  # pool 或 multi-port（也支持 multi_port）
 log_level: info
 skip_cert_verify: false  # 全局跳过 SSL 证书验证（默认 false）
+
 management:
   enabled: true
   listen: 0.0.0.0:9090
   probe_target: www.apple.com:80
   password: ""  # WebUI 访问密码，为空则不需要密码（可选）
+
 listener:
   address: 0.0.0.0
   port: 2323
   username: username
   password: password
+
 pool:
-  mode: sequential
+  # 轮询模式: sequential(顺序) | random(随机) | latency_first(延迟优先) | weighted(加权)
+  mode: latency_first
   failure_threshold: 3
-  blacklist_duration: 24h
+  blacklist_duration: 10m  # 失败后临时禁用时间
+
 multi_port:
   address: 0.0.0.0
   base_port: 24000
   username: mpuser
   password: mppass
+
+# ═══════════════════════════════════════════════════════════════
+# 延迟分组配置
+# ═══════════════════════════════════════════════════════════════
+latency_groups:
+  low_threshold: 100      # ≤100ms 为低延迟（高速）
+  medium_threshold: 300   # ≤300ms 为中延迟，>300ms 为高延迟
+
+# ═══════════════════════════════════════════════════════════════
+# 自动测速配置
+# ═══════════════════════════════════════════════════════════════
+auto_speedtest:
+  enabled: true
+  interval: 30m  # 每30分钟测速一次
+
+# ═══════════════════════════════════════════════════════════════
+# API 认证配置（保护代理池 API）
+# ═══════════════════════════════════════════════════════════════
+api_auth:
+  enabled: false
+  key: ""  # API Key，为空则不需要认证
+  # 使用方式: /api/proxy/get?key=你的密钥
+
+# ═══════════════════════════════════════════════════════════════
+# 订阅配置（支持 Web 端管理，也可以在这里预配置）
+# ═══════════════════════════════════════════════════════════════
+subscriptions:
+  # - name: "机场A"
+  #   url: "https://example.com/subscribe/v2ray"
+  #   enabled: true
+  #   refresh_interval: 1h
+  # - name: "机场B"
+  #   url: "https://example2.com/subscribe/clash"
+  #   enabled: true
+  #   refresh_interval: 2h
+
+subscription_refresh:
+  enabled: true           # 启用自动刷新
+  interval: 1h            # 刷新间隔
+  timeout: 30s            # 获取超时
+  health_check_timeout: 60s  # 新节点健康检查超时
+  drain_timeout: 30s      # 旧实例排空超时
+  min_available_nodes: 1  # 最少可用节点数
 
 # ═══════════════════════════════════════════════════════════════
 # 节点配置方式（三选一或混合使用）
@@ -44,4 +92,3 @@ nodes:
 # nodes_file: nodes.txt
 # nodes:
 #   - uri: "vless://xxx@server:443#额外节点"
-

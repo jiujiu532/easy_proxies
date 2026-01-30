@@ -61,6 +61,7 @@ type Server struct {
 	cfgSrc       *config.Config // 可持久化的配置对象
 	mgr          *Manager
 	srv          *http.Server
+	mux          *http.ServeMux // HTTP 路由
 	logger       *log.Logger
 	sessionToken string // 简单的 session token，重启后失效
 	subRefresher SubscriptionRefresher
@@ -83,6 +84,7 @@ func NewServer(cfg Config, mgr *Manager, logger *log.Logger) *Server {
 	s.sessionToken = hex.EncodeToString(tokenBytes)
 
 	mux := http.NewServeMux()
+	s.mux = mux
 	mux.HandleFunc("/", s.handleIndex)
 	mux.HandleFunc("/api/auth", s.handleAuth)
 	mux.HandleFunc("/api/settings", s.withAuth(s.handleSettings))
@@ -99,6 +101,23 @@ func NewServer(cfg Config, mgr *Manager, logger *log.Logger) *Server {
 	s.srv = &http.Server{Addr: cfg.Listen, Handler: mux}
 	return s
 }
+
+// Mux returns the HTTP ServeMux for external route registration.
+func (s *Server) Mux() *http.ServeMux {
+	if s == nil {
+		return nil
+	}
+	return s.mux
+}
+
+// WithAuth returns the authentication middleware wrapper.
+func (s *Server) WithAuth(next http.HandlerFunc) http.HandlerFunc {
+	if s == nil {
+		return next
+	}
+	return s.withAuth(next)
+}
+
 
 // SetSubscriptionRefresher sets the subscription refresher for API endpoints.
 func (s *Server) SetSubscriptionRefresher(sr SubscriptionRefresher) {

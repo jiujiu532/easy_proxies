@@ -27,13 +27,47 @@ type Config struct {
 	SubscriptionRefresh SubscriptionRefreshConfig `yaml:"subscription_refresh"`
 	Nodes               []NodeConfig              `yaml:"nodes"`
 	NodesFile           string                    `yaml:"nodes_file"`    // 节点文件路径，每行一个 URI
-	Subscriptions       []string                  `yaml:"subscriptions"` // 订阅链接列表
+	Subscriptions       []string                  `yaml:"subscriptions"` // 订阅链接列表（旧格式，兼容）
+	SubscriptionConfigs []SubscriptionConfig      `yaml:"subscription_configs"` // 订阅链接列表（新格式，支持更多选项）
 	ExternalIP          string                    `yaml:"external_ip"`      // 外部 IP 地址，用于导出时替换 0.0.0.0
 	LogLevel            string                    `yaml:"log_level"`
 	SkipCertVerify      bool                      `yaml:"skip_cert_verify"` // 全局跳过 SSL 证书验证
 
+	// Enhanced features
+	LatencyGroups  LatencyGroupsConfig  `yaml:"latency_groups"`   // 延迟分组配置
+	AutoSpeedtest  AutoSpeedtestConfig  `yaml:"auto_speedtest"`   // 自动测速配置
+	APIAuth        APIAuthConfig        `yaml:"api_auth"`         // API 认证配置
+
 	filePath string `yaml:"-"` // 配置文件路径，用于保存
 }
+
+// SubscriptionConfig defines a subscription source with more options
+type SubscriptionConfig struct {
+	ID              string `yaml:"id" json:"id"`
+	Name            string `yaml:"name" json:"name"`
+	URL             string `yaml:"url" json:"url"`
+	Enabled         bool   `yaml:"enabled" json:"enabled"`
+	RefreshInterval string `yaml:"refresh_interval" json:"refresh_interval"`
+}
+
+// LatencyGroupsConfig defines thresholds for latency grouping
+type LatencyGroupsConfig struct {
+	LowThreshold    int64 `yaml:"low_threshold"`    // ≤100ms default
+	MediumThreshold int64 `yaml:"medium_threshold"` // ≤300ms default
+}
+
+// AutoSpeedtestConfig controls automatic speed testing
+type AutoSpeedtestConfig struct {
+	Enabled  bool   `yaml:"enabled"`
+	Interval string `yaml:"interval"` // e.g., "30m"
+}
+
+// APIAuthConfig controls API authentication
+type APIAuthConfig struct {
+	Enabled bool   `yaml:"enabled"`
+	Key     string `yaml:"key"` // API key for authentication
+}
+
 
 // ListenerConfig defines how the HTTP proxy should listen for clients.
 type ListenerConfig struct {
@@ -948,6 +982,7 @@ func (c *Config) SaveNodes() error {
 func (c *Config) Save() error {
 	return c.SaveNodes()
 }
+
 
 // SaveSettings persists only config settings (external_ip, probe_target, skip_cert_verify)
 // without touching nodes.txt. Use this for settings API updates.

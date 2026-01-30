@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -87,8 +88,17 @@
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(0.95); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.6;
+        transform: scale(0.95);
+      }
     }
 
     /* Controls */
@@ -218,10 +228,21 @@
       transition: all 0.3s;
     }
 
-    .node-card.healthy::before { background: var(--success); }
-    .node-card.warning::before { background: var(--warning); }
-    .node-card.error::before { background: var(--error); }
-    .node-card.blacklisted::before { background: var(--text-primary); }
+    .node-card.healthy::before {
+      background: var(--success);
+    }
+
+    .node-card.warning::before {
+      background: var(--warning);
+    }
+
+    .node-card.error::before {
+      background: var(--error);
+    }
+
+    .node-card.blacklisted::before {
+      background: var(--text-primary);
+    }
 
     .node-card:hover {
       transform: translateY(-2px);
@@ -395,9 +416,17 @@
       color: var(--text-primary);
     }
 
-    .metric-value.success { color: var(--success); }
-    .metric-value.error { color: var(--error); }
-    .metric-value.warning { color: var(--warning); }
+    .metric-value.success {
+      color: var(--success);
+    }
+
+    .metric-value.error {
+      color: var(--error);
+    }
+
+    .metric-value.warning {
+      color: var(--warning);
+    }
 
     /* Footer */
     .node-footer {
@@ -434,21 +463,29 @@
       animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .toast.show { display: flex; }
+    .toast.show {
+      display: flex;
+    }
 
     @keyframes slideIn {
       from {
         transform: translateX(100px);
         opacity: 0;
       }
+
       to {
         transform: translateX(0);
         opacity: 1;
       }
     }
 
-    .toast.success { border-left: 3px solid var(--success); }
-    .toast.error { border-left: 3px solid var(--error); }
+    .toast.success {
+      border-left: 3px solid var(--success);
+    }
+
+    .toast.error {
+      border-left: 3px solid var(--error);
+    }
 
     .toast-message {
       flex: 1;
@@ -494,11 +531,18 @@
       animation: fadeIn 0.3s;
     }
 
-    .login-overlay.show { display: flex; }
+    .login-overlay.show {
+      display: flex;
+    }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     .login-modal {
@@ -518,6 +562,7 @@
         transform: translateY(40px);
         opacity: 0;
       }
+
       to {
         transform: translateY(0);
         opacity: 1;
@@ -588,7 +633,9 @@
       display: none;
     }
 
-    .login-error.show { display: block; }
+    .login-error.show {
+      display: block;
+    }
 
     /* Tabs */
     .tabs {
@@ -790,14 +837,14 @@
       background-color: white;
       transition: 0.3s;
       border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-    .toggle-switch input:checked + .toggle-slider {
+    .toggle-switch input:checked+.toggle-slider {
       background-color: var(--primary);
     }
 
-    .toggle-switch input:checked + .toggle-slider:before {
+    .toggle-switch input:checked+.toggle-slider:before {
       transform: translateX(22px);
     }
 
@@ -816,11 +863,18 @@
       animation: slideDown 0.3s ease;
     }
 
-    .probe-progress.show { display: block; }
+    .probe-progress.show {
+      display: block;
+    }
 
     @keyframes slideDown {
-      from { transform: translateY(-100%); }
-      to { transform: translateY(0); }
+      from {
+        transform: translateY(-100%);
+      }
+
+      to {
+        transform: translateY(0);
+      }
     }
 
     .probe-progress-header {
@@ -864,27 +918,73 @@
       gap: 16px;
     }
 
-    .probe-progress-detail .success { color: var(--success); }
-    .probe-progress-detail .failed { color: var(--error); }
+    .probe-progress-detail .success {
+      color: var(--success);
+    }
+
+    .probe-progress-detail .failed {
+      color: var(--error);
+    }
 
     /* Responsive */
     @media (max-width: 768px) {
-      .app { padding: 24px 16px; }
-      .header h1 { font-size: 36px; }
-      .header p { font-size: 17px; }
-      .stats { grid-template-columns: repeat(2, 1fr); }
-      .metrics { grid-template-columns: repeat(2, 1fr); }
-      .controls { flex-direction: column; }
-      .btn { width: 100%; justify-content: center; }
-      .login-modal { padding: 32px 24px; }
-      .tabs { flex-direction: column; }
-      .tab { width: 100%; }
-      .manage-actions { flex-direction: column; }
-      .config-node-card { flex-direction: column; align-items: stretch; }
-      .config-node-actions { justify-content: flex-end; }
+      .app {
+        padding: 24px 16px;
+      }
+
+      .header h1 {
+        font-size: 36px;
+      }
+
+      .header p {
+        font-size: 17px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .login-modal {
+        padding: 32px 24px;
+      }
+
+      .tabs {
+        flex-direction: column;
+      }
+
+      .tab {
+        width: 100%;
+      }
+
+      .manage-actions {
+        flex-direction: column;
+      }
+
+      .config-node-card {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .config-node-actions {
+        justify-content: flex-end;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="app">
     <header class="header">
@@ -895,10 +995,15 @@
           <span class="status-dot"></span>
           <span id="lastUpdate">正在加载...</span>
         </div>
-        <button class="btn btn-secondary" onclick="showSettingsModal()" style="padding: 0; border-radius: 50%; width: 36px; height: 36px; min-width: 36px; display: flex; align-items: center; justify-content: center;" title="系统设置">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button class="btn btn-secondary" onclick="showSettingsModal()"
+          style="padding: 0; border-radius: 50%; width: 36px; height: 36px; min-width: 36px; display: flex; align-items: center; justify-content: center;"
+          title="系统设置">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
           </svg>
         </button>
       </div>
@@ -908,72 +1013,79 @@
     <div class="tabs">
       <button class="tab active" onclick="switchTab('monitor')">📊 节点监控</button>
       <button class="tab" onclick="switchTab('manage')">⚙️ 节点管理</button>
+      <button class="tab" onclick="switchTab('proxypool')">🚀 代理池</button>
       <button class="tab" onclick="switchTab('debug')">🐞 调试面板</button>
     </div>
 
+
     <!-- 监控页面 -->
     <div id="monitorTab" class="tab-content active">
-    <div class="controls">
-      <button class="btn btn-primary" onclick="refresh()">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M13.65 2.35A7.958 7.958 0 0 0 8 0C3.58 0 0 3.58 0 8s3.58 8 8 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L9 7h7V0l-2.35 2.35z" fill="currentColor"/>
-        </svg>
-        刷新数据
-      </button>
-      <button class="btn btn-primary" id="probeAllBtn" onclick="probeAllNodes()">
-        ⚡ 探测全部
-      </button>
-      <button class="btn btn-secondary" onclick="toggleAutoRefresh()">
-        <span id="autoRefreshText">关闭自动刷新</span>
-      </button>
-      <button class="btn btn-secondary" onclick="exportNodes()">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M8 0L8 10M8 10L5 7M8 10L11 7M2 13h12v3H2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        导出节点
-      </button>
-      <button class="btn btn-secondary" id="refreshSubBtn" onclick="refreshSubscription()" style="display: none;">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M13.65 2.35A7.958 7.958 0 0 0 8 0C3.58 0 0 3.58 0 8s3.58 8 8 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L9 7h7V0l-2.35 2.35z" fill="currentColor"/>
-        </svg>
-        <span id="refreshSubText">刷新订阅</span>
-      </button>
-    </div>
+      <div class="controls">
+        <button class="btn btn-primary" onclick="refresh()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M13.65 2.35A7.958 7.958 0 0 0 8 0C3.58 0 0 3.58 0 8s3.58 8 8 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L9 7h7V0l-2.35 2.35z"
+              fill="currentColor" />
+          </svg>
+          刷新数据
+        </button>
+        <button class="btn btn-primary" id="probeAllBtn" onclick="probeAllNodes()">
+          ⚡ 探测全部
+        </button>
+        <button class="btn btn-secondary" onclick="toggleAutoRefresh()">
+          <span id="autoRefreshText">关闭自动刷新</span>
+        </button>
+        <button class="btn btn-secondary" onclick="exportNodes()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 0L8 10M8 10L5 7M8 10L11 7M2 13h12v3H2z" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          导出节点
+        </button>
+        <button class="btn btn-secondary" id="refreshSubBtn" onclick="refreshSubscription()" style="display: none;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M13.65 2.35A7.958 7.958 0 0 0 8 0C3.58 0 0 3.58 0 8s3.58 8 8 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L9 7h7V0l-2.35 2.35z"
+              fill="currentColor" />
+          </svg>
+          <span id="refreshSubText">刷新订阅</span>
+        </button>
+      </div>
 
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-label">总节点</div>
-        <div class="stat-value" id="totalNodes">0</div>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-label">总节点</div>
+          <div class="stat-value" id="totalNodes">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">健康节点</div>
+          <div class="stat-value" style="color: var(--success);" id="healthyNodes">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">活跃连接</div>
+          <div class="stat-value" style="color: var(--primary);" id="activeConnections">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">拉黑节点</div>
+          <div class="stat-value" style="color: var(--error);" id="blacklistedNodes">0</div>
+        </div>
+        <div class="stat-card" id="subscriptionCard" style="display: none;">
+          <div class="stat-label">订阅状态</div>
+          <div class="stat-value" style="font-size: 24px;" id="subscriptionStatus">-</div>
+          <div class="stat-trend" id="subscriptionTrend">未启用</div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">健康节点</div>
-        <div class="stat-value" style="color: var(--success);" id="healthyNodes">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">活跃连接</div>
-        <div class="stat-value" style="color: var(--primary);" id="activeConnections">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">拉黑节点</div>
-        <div class="stat-value" style="color: var(--error);" id="blacklistedNodes">0</div>
-      </div>
-      <div class="stat-card" id="subscriptionCard" style="display: none;">
-        <div class="stat-label">订阅状态</div>
-        <div class="stat-value" style="font-size: 24px;" id="subscriptionStatus">-</div>
-        <div class="stat-trend" id="subscriptionTrend">未启用</div>
-      </div>
-    </div>
 
-    <div id="nodesContainer" class="nodes-grid"></div>
+      <div id="nodesContainer" class="nodes-grid"></div>
 
-    <div id="emptyState" class="empty" style="display: none;">
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" opacity="0.2">
-        <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="4"/>
-        <path d="M32 16v32M16 32h32" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-      </svg>
-      <h3>暂无代理节点</h3>
-      <p>请在配置文件中添加代理节点</p>
-    </div>
+      <div id="emptyState" class="empty" style="display: none;">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" opacity="0.2">
+          <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="4" />
+          <path d="M32 16v32M16 32h32" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+        </svg>
+        <h3>暂无代理节点</h3>
+        <p>请在配置文件中添加代理节点</p>
+      </div>
     </div><!-- end monitorTab -->
 
     <!-- 节点管理页面 -->
@@ -986,13 +1098,15 @@
       <div class="manage-actions">
         <button class="btn btn-primary" onclick="showAddNodeModal()">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
           </svg>
           添加节点
         </button>
         <button class="btn btn-warning" onclick="triggerReload()" id="reloadBtn">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M13.65 2.35A7.958 7.958 0 0 0 8 0C3.58 0 0 3.58 0 8s3.58 8 8 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L9 7h7V0l-2.35 2.35z" fill="currentColor"/>
+            <path
+              d="M13.65 2.35A7.958 7.958 0 0 0 8 0C3.58 0 0 3.58 0 8s3.58 8 8 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L9 7h7V0l-2.35 2.35z"
+              fill="currentColor" />
           </svg>
           重载配置
         </button>
@@ -1002,7 +1116,8 @@
         ⚠️ 重载配置会中断所有现有连接，请谨慎操作
       </div>
 
-      <div id="subscriptionWarning" class="reload-warning" style="display: none; background: rgba(255, 59, 48, 0.1); border-color: rgba(255, 59, 48, 0.3); color: var(--error);">
+      <div id="subscriptionWarning" class="reload-warning"
+        style="display: none; background: rgba(255, 59, 48, 0.1); border-color: rgba(255, 59, 48, 0.3); color: var(--error);">
         ⚠️ 当前使用订阅模式：您的修改会保存到 nodes.txt，但下次刷新订阅时将被覆盖
       </div>
 
@@ -1010,16 +1125,122 @@
 
       <div id="configEmptyState" class="empty" style="display: none;">
         <svg width="64" height="64" viewBox="0 0 64 64" fill="none" opacity="0.2">
-          <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="4"/>
-          <path d="M32 16v32M16 32h32" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="4" />
+          <path d="M32 16v32M16 32h32" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
         </svg>
         <h3>暂无配置节点</h3>
         <p>点击"添加节点"开始配置</p>
       </div>
     </div><!-- end manageTab -->
 
+    <!-- 代理池页面 -->
+    <div id="proxypoolTab" class="tab-content">
+      <div class="manage-header">
+        <h2>🚀 代理池 API</h2>
+        <p class="manage-desc">通过 API 获取可用代理，支持按条件筛选</p>
+      </div>
+
+      <div class="stats" style="margin-bottom: 32px;">
+        <div class="stat-card">
+          <div class="stat-label">可用节点</div>
+          <div class="stat-value" id="poolTotalNodes">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">低延迟节点</div>
+          <div class="stat-value" style="color: var(--success);" id="poolLowNodes">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">中延迟节点</div>
+          <div class="stat-value" style="color: var(--warning);" id="poolMediumNodes">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">高延迟节点</div>
+          <div class="stat-value" style="color: var(--error);" id="poolHighNodes">-</div>
+        </div>
+      </div>
+
+      <div
+        style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 18px; padding: 28px; margin-bottom: 24px;">
+        <h3 style="margin-bottom: 16px; font-size: 18px;">📖 API 使用说明</h3>
+
+        <div style="background: rgba(0,0,0,0.03); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--primary);">获取单个代理</div>
+          <code
+            style="font-family: 'SF Mono', Menlo, monospace; font-size: 13px; display: block; padding: 8px; background: rgba(0,0,0,0.05); border-radius: 8px; word-break: break-all;">
+            GET /api/proxy/get
+          </code>
+          <code
+            style="font-family: 'SF Mono', Menlo, monospace; font-size: 13px; display: block; padding: 8px; background: rgba(0,0,0,0.05); border-radius: 8px; word-break: break-all; margin-top: 4px;">
+            GET /api/proxy/get?latency=low  <span style="color: var(--text-secondary);"># 只获取低延迟</span>
+          </code>
+          <code
+            style="font-family: 'SF Mono', Menlo, monospace; font-size: 13px; display: block; padding: 8px; background: rgba(0,0,0,0.05); border-radius: 8px; word-break: break-all; margin-top: 4px;">
+            GET /api/proxy/get?region=JP  <span style="color: var(--text-secondary);"># 只获取日本节点</span>
+          </code>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.03); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--primary);">获取代理列表</div>
+          <code
+            style="font-family: 'SF Mono', Menlo, monospace; font-size: 13px; display: block; padding: 8px; background: rgba(0,0,0,0.05); border-radius: 8px; word-break: break-all;">
+            GET /api/proxy/list
+          </code>
+          <code
+            style="font-family: 'SF Mono', Menlo, monospace; font-size: 13px; display: block; padding: 8px; background: rgba(0,0,0,0.05); border-radius: 8px; word-break: break-all; margin-top: 4px;">
+            GET /api/proxy/list?latency=low&limit=10  <span style="color: var(--text-secondary);"># 组合筛选</span>
+          </code>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.03); border-radius: 12px; padding: 16px;">
+          <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--primary);">可用参数</div>
+          <table style="width: 100%; font-size: 13px;">
+            <tr>
+              <td style="padding: 4px 8px;"><code>latency</code></td>
+              <td>low / medium / high</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 8px;"><code>region</code></td>
+              <td>US / JP / HK / SG / ...</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 8px;"><code>sub</code></td>
+              <td>订阅名称</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 8px;"><code>format</code></td>
+              <td>json (默认纯文本)</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 8px;"><code>key</code></td>
+              <td>API 密钥 (如果启用)</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="controls" style="justify-content: flex-start;">
+        <button class="btn btn-primary" onclick="testProxyAPI()">
+          ⚡ 测试获取代理
+        </button>
+        <button class="btn btn-secondary" onclick="loadPoolStats()">
+          📊 刷新统计
+        </button>
+        <button class="btn btn-secondary" onclick="copyAPIUrl()">
+          📋 复制 API 地址
+        </button>
+      </div>
+
+      <div id="poolTestResult"
+        style="margin-top: 16px; padding: 16px; background: rgba(0,0,0,0.03); border-radius: 12px; display: none;">
+        <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">测试结果</div>
+        <pre id="poolTestResultContent"
+          style="font-family: 'SF Mono', Menlo, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all;"></pre>
+      </div>
+    </div><!-- end proxypoolTab -->
+
     <!-- 调试面板 -->
     <div id="debugTab" class="tab-content">
+
       <div class="manage-header">
         <h2>调试面板</h2>
         <p class="manage-desc">查看节点调用统计、成功率和最近使用情况</p>
@@ -1044,8 +1265,8 @@
 
       <div id="debugEmptyState" class="empty" style="display: none;">
         <svg width="64" height="64" viewBox="0 0 64 64" fill="none" opacity="0.2">
-          <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="4"/>
-          <path d="M32 16v32M16 32h32" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="4" />
+          <path d="M32 16v32M16 32h32" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
         </svg>
         <h3>暂无调试数据</h3>
         <p>节点使用后将显示统计信息</p>
@@ -1148,14 +1369,8 @@
       <form class="login-form" onsubmit="handleLogin(event)">
         <div class="form-group">
           <label class="form-label" for="password">密码</label>
-          <input
-            type="password"
-            id="password"
-            class="form-input"
-            placeholder="请输入密码"
-            autocomplete="current-password"
-            required
-          />
+          <input type="password" id="password" class="form-input" placeholder="请输入密码" autocomplete="current-password"
+            required />
         </div>
         <div id="loginError" class="login-error">密码错误，请重试</div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">
@@ -1702,7 +1917,7 @@
             if (!isNaN(d.getTime())) {
               time = d.toLocaleTimeString('zh-CN');
             }
-          } catch (e) {}
+          } catch (e) { }
           const title = `${time} - ${t.success ? '成功' : '失败'}${t.latency_ms > 0 ? ' (' + t.latency_ms + 'ms)' : ''}${t.error ? ' - ' + t.error : ''}`;
           return `<div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;" title="${escapeHtml(title)}"></div>`;
         }).join('') : '<span style="font-size:12px;color:var(--text-secondary);">暂无最近记录</span>';
@@ -1823,10 +2038,73 @@
         loadConfigNodes();
       } else if (tabName === 'debug') {
         loadDebugData();
+      } else if (tabName === 'proxypool') {
+        loadPoolStats();
       }
     }
 
+    // ========== 代理池功能 ==========
+
+    async function loadPoolStats() {
+      try {
+        const res = await fetch('/api/proxy/stats');
+        if (!res.ok) {
+          console.error('Failed to load pool stats');
+          return;
+        }
+        const data = await res.json();
+
+        document.getElementById('poolTotalNodes').textContent = data.total_nodes || 0;
+
+        const byLatency = data.by_latency || {};
+        document.getElementById('poolLowNodes').textContent = byLatency.low || 0;
+        document.getElementById('poolMediumNodes').textContent = byLatency.medium || 0;
+        document.getElementById('poolHighNodes').textContent = byLatency.high || 0;
+      } catch (err) {
+        console.error('Error loading pool stats:', err);
+      }
+    }
+
+    async function testProxyAPI() {
+      const resultDiv = document.getElementById('poolTestResult');
+      const contentEl = document.getElementById('poolTestResultContent');
+      resultDiv.style.display = 'block';
+      contentEl.textContent = '正在获取...';
+
+      try {
+        // Test with JSON format
+        const res = await fetch('/api/proxy/get?format=json&latency=low');
+        const text = await res.text();
+
+        try {
+          const data = JSON.parse(text);
+          contentEl.textContent = JSON.stringify(data, null, 2);
+        } catch {
+          contentEl.textContent = text;
+        }
+
+        if (!res.ok) {
+          contentEl.style.color = 'var(--error)';
+        } else {
+          contentEl.style.color = 'var(--success)';
+        }
+      } catch (err) {
+        contentEl.textContent = '请求失败: ' + err.message;
+        contentEl.style.color = 'var(--error)';
+      }
+    }
+
+    function copyAPIUrl() {
+      const url = window.location.origin + '/api/proxy/get?latency=low';
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('API 地址已复制: ' + url, 'success');
+      }).catch(err => {
+        showToast('复制失败: ' + err.message, 'error');
+      });
+    }
+
     // 加载配置节点列表
+
     async function loadConfigNodes() {
       try {
         const res = await fetch('/api/nodes/config');
@@ -1888,7 +2166,7 @@
 
       // 使用事件委托处理按钮点击
       container.querySelectorAll('button[data-action]').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
           const index = parseInt(this.dataset.index);
           const action = this.dataset.action;
           const node = configNodes[index];
@@ -2061,4 +2339,5 @@
     })();
   </script>
 </body>
+
 </html>
