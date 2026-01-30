@@ -323,7 +323,7 @@ func (h *ProxyPoolHandler) handleSubscriptions(w http.ResponseWriter, r *http.Re
 					break
 				}
 			}
-		if !exists {
+			if !exists {
 				h.cfg.Subscriptions = append(h.cfg.Subscriptions, sub.URL)
 				if err := h.cfg.SaveSubscriptions(); err == nil {
 					configUpdated = true
@@ -331,11 +331,19 @@ func (h *ProxyPoolHandler) handleSubscriptions(w http.ResponseWriter, r *http.Re
 			}
 		}
 
+		// Auto trigger reload after adding subscription
+		reloadTriggered := false
+		if h.nodeMgr != nil && configUpdated {
+			if err := h.nodeMgr.TriggerReload(r.Context()); err == nil {
+				reloadTriggered = true
+			}
+		}
+
 		writePoolJSON(w, map[string]any{
-			"message":        "Subscription added",
-			"subscription":   sub,
-			"config_updated": configUpdated,
-			"note":           "请点击热重载按钮使订阅生效",
+			"message":          "Subscription added",
+			"subscription":     sub,
+			"config_updated":   configUpdated,
+			"reload_triggered": reloadTriggered,
 		})
 
 	default:
@@ -416,10 +424,18 @@ func (h *ProxyPoolHandler) handleSubscriptionItem(w http.ResponseWriter, r *http
 			}
 		}
 
+		// Auto trigger reload after deleting subscription
+		reloadTriggered := false
+		if h.nodeMgr != nil {
+			if err := h.nodeMgr.TriggerReload(r.Context()); err == nil {
+				reloadTriggered = true
+			}
+		}
+
 		writePoolJSON(w, map[string]any{
-			"message":        "Subscription deleted",
-			"config_updated": configUpdated,
-			"note":           "请点击热重载按钮清理节点",
+			"message":          "Subscription deleted",
+			"config_updated":   configUpdated,
+			"reload_triggered": reloadTriggered,
 		})
 
 	case http.MethodPost:
