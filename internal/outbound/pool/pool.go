@@ -50,6 +50,8 @@ type MemberMeta struct {
 	Mode          string
 	ListenAddress string
 	Port          uint16
+	Region        string
+	RegionName    string
 }
 
 // Register wires the pool outbound into the registry.
@@ -114,7 +116,7 @@ func newPool(ctx context.Context, _ adapter.Router, logger log.ContextLogger, ta
 			// Acquire shared state for this tag (creates if not exists)
 			state := acquireSharedState(memberTag)
 
-			meta := normalized.Metadata[memberTag]
+		meta := normalized.Metadata[memberTag]
 			info := monitor.NodeInfo{
 				Tag:           memberTag,
 				Name:          meta.Name,
@@ -122,6 +124,8 @@ func newPool(ctx context.Context, _ adapter.Router, logger log.ContextLogger, ta
 				Mode:          meta.Mode,
 				ListenAddress: meta.ListenAddress,
 				Port:          meta.Port,
+				Region:        meta.Region,
+				RegionName:    meta.RegionName,
 			}
 			entry := monitorMgr.Register(info)
 			if entry != nil {
@@ -215,6 +219,8 @@ func (p *poolOutbound) initializeMembersLocked() error {
 				Mode:          meta.Mode,
 				ListenAddress: meta.ListenAddress,
 				Port:          meta.Port,
+				Region:        meta.Region,
+				RegionName:    meta.RegionName,
 			}
 			entry := p.monitor.Register(info)
 			if entry != nil {

@@ -121,12 +121,14 @@ const (
 
 // NodeConfig describes a single upstream proxy endpoint expressed as URI.
 type NodeConfig struct {
-	Name     string     `yaml:"name" json:"name"`
-	URI      string     `yaml:"uri" json:"uri"`
-	Port     uint16     `yaml:"port,omitempty" json:"port,omitempty"`
-	Username string     `yaml:"username,omitempty" json:"username,omitempty"`
-	Password string     `yaml:"password,omitempty" json:"password,omitempty"`
-	Source   NodeSource `yaml:"-" json:"source,omitempty"` // Runtime only, not persisted
+	Name       string     `yaml:"name" json:"name"`
+	URI        string     `yaml:"uri" json:"uri"`
+	Port       uint16     `yaml:"port,omitempty" json:"port,omitempty"`
+	Username   string     `yaml:"username,omitempty" json:"username,omitempty"`
+	Password   string     `yaml:"password,omitempty" json:"password,omitempty"`
+	Region     string     `yaml:"-" json:"region,omitempty"`      // Runtime only
+	RegionName string     `yaml:"-" json:"region_name,omitempty"` // Runtime only
+	Source     NodeSource `yaml:"-" json:"source,omitempty"`      // Runtime only, not persisted
 }
 
 // NodeKey returns a unique identifier for the node based on its URI.

@@ -14,10 +14,11 @@ import (
 
 // ProxyPoolHandler handles proxy pool API requests
 type ProxyPoolHandler struct {
-	pool    *proxypool.ProxyPool
-	store   *store.Store
-	cfg     *config.Config
-	nodeMgr NodeManager
+	pool       *proxypool.ProxyPool
+	store      *store.Store
+	cfg        *config.Config
+	nodeMgr    NodeManager
+	monitorMgr *Manager
 }
 
 // NewProxyPoolHandler creates a new handler
@@ -36,6 +37,11 @@ func (h *ProxyPoolHandler) SetConfig(cfg *config.Config) {
 // SetNodeManager sets the node manager for triggering reloads
 func (h *ProxyPoolHandler) SetNodeManager(nm NodeManager) {
 	h.nodeMgr = nm
+}
+
+// SetMonitorManager sets the monitor manager for unified node data
+func (h *ProxyPoolHandler) SetMonitorManager(mgr *Manager) {
+	h.monitorMgr = mgr
 }
 
 // RegisterRoutes registers proxy pool API routes
@@ -183,13 +189,52 @@ func (h *ProxyPoolHandler) handleListProxies(w http.ResponseWriter, r *http.Requ
 	})
 }
 
-// handleStats returns pool statistics
+// handleStats returns pool statistics from monitor manager (single source of truth)
 func (h *ProxyPoolHandler) handleStats(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// If monitor manager is available, use it as single source of truth
+	if h.monitorMgr != nil {
+		snapshots := h.monitorMgr.Snapshot()
+		stats := struct {
+			TotalNodes     int            `json:"total_nodes"`
+			AvailableNodes int            `json:"available_nodes"`
+			Mode           string         `json:"mode"`
+			ByLatency      map[string]int `json:"by_latency"`
+			ByRegion       map[string]int `json:"by_region"`
+		}{
+			TotalNodes:     len(snapshots),
+			AvailableNodes: 0,
+			Mode:           "monitor",
+			ByLatency:      make(map[string]int),
+			ByRegion:       make(map[string]int),
+		}
+
+		for _, snap := range snapshots {
+			if snap.Available && !snap.Blacklisted {
+				stats.AvailableNodes++
+				// Categorize by latency
+				latencyMs := snap.LastLatencyMs
+				if latencyMs <= 0 {
+					stats.ByLatency["unknown"]++
+				} else if latencyMs <= 100 {
+					stats.ByLatency["low"]++
+				} else if latencyMs <= 300 {
+					stats.ByLatency["medium"]++
+				} else {
+					stats.ByLatency["high"]++
+				}
+			}
+		}
+
+		writePoolJSON(w, stats)
+		return
+	}
+
+	// Fallback to pool stats
 	stats := h.pool.Stats()
 	writePoolJSON(w, stats)
 }
@@ -425,27 +470,41 @@ func (h *ProxyPoolHandler) handleNodeStatus(w http.ResponseWriter, r *http.Reque
 
 // --- Group API ---
 
-// handleGroupsByLatency returns nodes grouped by latency
+// handleGroupsByLatency returns nodes grouped by latency (from monitor manager)
 func (h *ProxyPoolHandler) handleGroupsByLatency(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	groups := h.store.GetGroupedByLatency()
 	result := make(map[string][]map[string]any)
+	result["low"] = []map[string]any{}
+	result["medium"] = []map[string]any{}
+	result["high"] = []map[string]any{}
+	result["unknown"] = []map[string]any{}
 
-	for level, nodes := range groups {
-		nodeList := make([]map[string]any, 0, len(nodes))
-		for _, node := range nodes {
-			nodeList = append(nodeList, map[string]any{
-				"name":         node.Name,
-				"region":       node.Region,
-				"latency":      node.Latency,
-				"subscription": node.SubscriptionName,
-			})
+	if h.monitorMgr != nil {
+		snapshots := h.monitorMgr.Snapshot()
+		for _, snap := range snapshots {
+			if !snap.Available || snap.Blacklisted {
+				continue
+			}
+			node := map[string]any{
+				"name":    snap.Name,
+				"latency": snap.LastLatencyMs,
+			}
+
+			latencyMs := snap.LastLatencyMs
+			if latencyMs <= 0 {
+				result["unknown"] = append(result["unknown"], node)
+			} else if latencyMs <= 100 {
+				result["low"] = append(result["low"], node)
+			} else if latencyMs <= 300 {
+				result["medium"] = append(result["medium"], node)
+			} else {
+				result["high"] = append(result["high"], node)
+			}
 		}
-		result[string(level)] = nodeList
 	}
 
 	writePoolJSON(w, map[string]any{
@@ -454,27 +513,37 @@ func (h *ProxyPoolHandler) handleGroupsByLatency(w http.ResponseWriter, r *http.
 	})
 }
 
-// handleGroupsByRegion returns nodes grouped by region
+// handleGroupsByRegion returns nodes grouped by region (from monitor manager)
 func (h *ProxyPoolHandler) handleGroupsByRegion(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	groups := h.store.GetGroupedByRegion()
 	result := make(map[string][]map[string]any)
 
-	for region, nodes := range groups {
-		nodeList := make([]map[string]any, 0, len(nodes))
-		for _, node := range nodes {
-			nodeList = append(nodeList, map[string]any{
-				"name":         node.Name,
-				"latency":      node.Latency,
-				"latency_level": node.LatencyLevel,
-				"subscription": node.SubscriptionName,
-			})
+	if h.monitorMgr != nil {
+		snapshots := h.monitorMgr.Snapshot()
+		for _, snap := range snapshots {
+			if !snap.Available || snap.Blacklisted {
+				continue
+			}
+			region := snap.Region
+			if region == "" {
+				region = "unknown"
+			}
+
+			node := map[string]any{
+				"name":          snap.Name,
+				"latency":       snap.LastLatencyMs,
+				"region_name":   snap.RegionName,
+			}
+
+			if result[region] == nil {
+				result[region] = []map[string]any{}
+			}
+			result[region] = append(result[region], node)
 		}
-		result[region] = nodeList
 	}
 
 	writePoolJSON(w, map[string]any{"groups": result})

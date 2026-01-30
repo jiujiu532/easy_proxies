@@ -121,6 +121,7 @@ func Run(ctx context.Context, cfg *config.Config) error {
 		poolHandler := monitor.NewProxyPoolHandler(pool, st)
 		poolHandler.SetConfig(cfg)
 		poolHandler.SetNodeManager(boxMgr)
+		poolHandler.SetMonitorManager(boxMgr.MonitorManager())
 		poolHandler.RegisterRoutes(server.Mux(), server.WithAuth)
 	}
 

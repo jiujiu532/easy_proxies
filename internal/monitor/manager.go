@@ -36,6 +36,8 @@ type NodeInfo struct {
 	Mode          string `json:"mode"`
 	ListenAddress string `json:"listen_address,omitempty"`
 	Port          uint16 `json:"port,omitempty"`
+	Region        string `json:"region,omitempty"`
+	RegionName    string `json:"region_name,omitempty"`
 }
 
 // TimelineEvent represents a single usage event for debug tracking.
