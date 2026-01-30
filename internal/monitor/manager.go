@@ -206,7 +206,7 @@ func (m *Manager) probeAllNodes(timeout time.Duration) {
 	}
 
 	// 使用高并发数加快健康检查速度
-	workerLimit := 100 // 支持同时探测 100 个节点
+	workerLimit := 300 // 支持同时探测 300 个节点
 	sem := make(chan struct{}, workerLimit)
 	var wg sync.WaitGroup
 	var availableCount atomic.Int32
