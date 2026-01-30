@@ -308,6 +308,9 @@ func (p *ProxyPool) SetAPIKey(key string) {
 
 // Stats returns pool statistics
 func (p *ProxyPool) Stats() PoolStats {
+	// Refresh nodes first to ensure up-to-date data
+	p.RefreshNodes()
+
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
