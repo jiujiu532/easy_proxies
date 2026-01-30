@@ -245,9 +245,9 @@ func (h *ProxyPoolHandler) handleSubscriptions(w http.ResponseWriter, r *http.Re
 					break
 				}
 			}
-			if !exists {
+		if !exists {
 				h.cfg.Subscriptions = append(h.cfg.Subscriptions, sub.URL)
-				if err := h.cfg.Save(); err == nil {
+				if err := h.cfg.SaveSubscriptions(); err == nil {
 					configUpdated = true
 				}
 			}
@@ -332,7 +332,7 @@ func (h *ProxyPoolHandler) handleSubscriptionItem(w http.ResponseWriter, r *http
 			}
 			if len(newSubs) < len(h.cfg.Subscriptions) {
 				h.cfg.Subscriptions = newSubs
-				if err := h.cfg.Save(); err == nil {
+				if err := h.cfg.SaveSubscriptions(); err == nil {
 					configUpdated = true
 				}
 			}
