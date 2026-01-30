@@ -1,25 +1,30 @@
-# Easy Proxies
+# Easy Proxies (Enhanced)
 
 English | [简体中文](README_ZH.md)
 
-A proxy node pool management tool based on [sing-box](https://github.com/SagerNet/sing-box), supporting multiple protocols, automatic failover, and load balancing.
+> 🚀 **增强版** - 基于 [jasonwong1991/easy_proxies](https://github.com/jasonwong1991/easy_proxies) 二次开发
 
-## Features
+A proxy node pool management tool based on [sing-box](https://github.com/SagerNet/sing-box), with **enhanced proxy pool API** for dynamic proxy selection.
+
+## ✨ Enhanced Features (New)
+
+- **🚀 Proxy Pool API**: Get proxies via HTTP API with filters
+- **📊 Latency Grouping**: Auto-group nodes by latency (low/medium/high)
+- **🌍 Region Detection**: Auto-detect node regions from names (emoji flags + keywords)
+- **🔄 Rotation Modes**: Sequential, Random, Latency-First, Weighted
+- **📦 Subscription Management API**: CRUD operations for subscriptions
+- **⚡ Auto Speedtest**: Periodic latency testing with auto-refresh
+
+## Original Features
 
 - **Multi-Protocol Support**: VMess, VLESS, Hysteria2, Shadowsocks, Trojan
 - **Multiple Transports**: TCP, WebSocket, HTTP/2, gRPC, HTTPUpgrade
 - **Subscription Support**: Auto-fetch nodes from subscription links (Base64, Clash YAML, etc.)
-- **Subscription Auto-Refresh**: Automatic periodic refresh with WebUI manual trigger (⚠️ causes connection interruption)
 - **Pool Mode**: Automatic failover and load balancing
 - **Multi-Port Mode**: Each node listens on independent port
 - **Hybrid Mode**: Pool + Multi-Port simultaneously with shared node state
 - **Web Dashboard**: Real-time node status, latency probing, one-click export
-- **WebUI Settings**: Modify external_ip and probe_target without editing config files
 - **Password Protection**: WebUI authentication support
-- **Auto Health Check**: Initial check on startup, periodic checks every 5 minutes
-- **Smart Node Filtering**: Auto-hide unavailable nodes, sort by latency
-- **Port Preservation**: Existing nodes keep their ports when adding/updating nodes
-- **Flexible Configuration**: Config file, node file, subscription links
 - **Multi-Architecture**: Docker images for both AMD64 and ARM64
 
 ## Quick Start
@@ -40,10 +45,13 @@ Edit `config.yaml` to set listen address and credentials, edit `nodes.txt` to ad
 **Docker (Recommended):**
 
 ```bash
-./start.sh
+docker run -d --name easy-proxies \
+  --network host \
+  -v ./config.yaml:/etc/easy-proxies/config.yaml \
+  jiuuij/easy_proxies:latest
 ```
 
-Or manually:
+Or with docker-compose:
 
 ```bash
 docker compose up -d
@@ -470,7 +478,7 @@ Use `network_mode: host` for direct host network access:
 # docker-compose.yml
 services:
   easy-proxies:
-    image: ghcr.io/jasonwong1991/easy_proxies:latest
+    image: jiuuij/easy_proxies:latest
     container_name: easy-proxies
     restart: unless-stopped
     network_mode: host
@@ -491,12 +499,12 @@ Manually specify port mappings:
 # docker-compose.yml
 services:
   easy-proxies:
-    image: ghcr.io/jasonwong1991/easy_proxies:latest
+    image: jiuuij/easy_proxies:latest
     container_name: easy-proxies
     restart: unless-stopped
     ports:
       - "2323:2323"       # Pool/Hybrid mode entry
-      - "9091:9091"       # Web dashboard
+      - "9090:9090"       # Web dashboard
       - "24000-24200:24000-24200"  # Multi-Port/Hybrid mode
     volumes:
       - ./config.yaml:/etc/easy-proxies/config.yaml
@@ -515,9 +523,55 @@ go build -o easy-proxies ./cmd/easy_proxies
 go build -tags "with_utls with_quic with_grpc with_wireguard with_gvisor" -o easy-proxies ./cmd/easy_proxies
 ```
 
-## Star History
+## 🚀 Proxy Pool API (Enhanced)
 
-[![Star History Chart](https://api.star-history.com/svg?repos=jasonwong1991/easy_proxies&type=Date)](https://star-history.com/#jasonwong1991/easy_proxies&Date)
+### Get a Proxy
+
+```bash
+# Get any available proxy
+curl http://localhost:9090/api/proxy/get
+
+# Get low-latency proxy
+curl http://localhost:9090/api/proxy/get?latency=low
+
+# Get proxy from specific region
+curl http://localhost:9090/api/proxy/get?region=JP
+
+# Get JSON response
+curl http://localhost:9090/api/proxy/get?format=json
+```
+
+### Query Parameters
+
+| Parameter | Values | Description |
+|-----------|--------|-------------|
+| `latency` | low, medium, high | Filter by latency group |
+| `region` | US, JP, HK, SG, ... | Filter by region code |
+| `sub` | subscription_name | Filter by subscription |
+| `format` | json | Return JSON instead of plain text |
+| `key` | api_key | API authentication key |
+
+### Enhanced Config Options
+
+```yaml
+# Latency thresholds (ms)
+latency_groups:
+  low_threshold: 100      # ≤100ms = low
+  medium_threshold: 300   # ≤300ms = medium, >300ms = high
+
+# Auto speedtest
+auto_speedtest:
+  enabled: true
+  interval: 30m
+
+# Pool rotation mode
+pool:
+  mode: latency_first     # sequential, random, latency_first, weighted
+```
+
+## Credits
+
+Based on [jasonwong1991/easy_proxies](https://github.com/jasonwong1991/easy_proxies)
 
 ## License
 
